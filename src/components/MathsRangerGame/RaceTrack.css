@@ -7,8 +7,8 @@
 
 .race-track {
   position: relative;
-  width: 600px; /* Increased from 400px */
-  height: 400px; /* Increased from 250px */
+  width: 800px; /* Increased from 600px for more horizontal space */
+  height: 500px; /* Increased from 400px */
   margin-bottom: 20px;
 }
 
@@ -16,8 +16,8 @@
   width: 100%;
   height: 100%;
   background: #8b4513;
-  border-radius: 80px; /* Increased from 50px */
-  padding: 30px; /* Increased from 20px */
+  border-radius: 100px; /* Increased for the larger track */
+  padding: 40px; /* Increased padding */
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   position: relative;
 }
@@ -26,37 +26,51 @@
   width: 100%;
   height: 100%;
   background: #228b22;
-  border-radius: 50px; /* Increased from 30px */
+  border-radius: 60px; /* Increased for the larger track */
   position: relative;
   overflow: hidden;
 }
 
+/* Lane dividers to show separate tracks */
 .track-inner::before {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: calc(100% - 60px); /* Increased from 40px */
-  height: calc(100% - 60px); /* Increased from 40px */
-  border: 4px dashed #ffff00; /* Increased from 3px */
-  border-radius: 30px; /* Increased from 20px */
+  width: calc(100% - 80px);
+  height: calc(100% - 80px);
+  border: 4px dashed #ffff00;
+  border-radius: 40px;
+  z-index: 1;
+}
+
+/* Individual lane markers */
+.track-inner::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 160px);
+  height: calc(100% - 160px);
+  border: 2px dashed #ffff00;
+  border-radius: 20px;
   z-index: 1;
 }
 
 .finish-line {
   position: absolute;
-  top: 30px; /* Increased from 20px */
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 2.5rem; /* Increased from 2rem */
+  top: 40px;
+  right: 50px;
+  font-size: 3rem;
   z-index: 2;
   animation: wave 2s ease-in-out infinite;
 }
 
 .car {
   position: absolute;
-  font-size: 2.5rem; /* Increased from 2rem */
+  font-size: 3rem; /* Increased from 2.5rem */
   z-index: 3;
   transition: all 0.1s ease;
   transform-origin: center;
@@ -89,43 +103,23 @@
 }
 
 .progress-indicators {
-  width: 100%;
-  max-width: 600px; /* Increased from 400px */
-  background: rgba(255, 255, 255, 0.9);
-  padding: 15px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: none;
 }
 
 .progress-bar {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  position: relative;
-  height: 25px;
-  background: #e0e0e0;
-  border-radius: 12px;
-  overflow: hidden;
+  display: none;
 }
 
 .progress-label {
-  position: absolute;
-  left: 10px;
-  font-weight: bold;
-  font-size: 0.9rem;
-  z-index: 2;
-  color: #333;
+  display: none;
 }
 
 .progress-fill {
-  height: 100%;
-  background: linear-gradient(45deg, #4caf50, #8bc34a);
-  transition: width 0.1s ease;
-  border-radius: 12px;
+  display: none;
 }
 
 .ai-fill {
-  background: linear-gradient(45deg, #ff5722, #ff9800);
+  display: none;
 }
 
 @keyframes wave {
@@ -150,15 +144,34 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .race-track {
-    width: 400px; /* Increased from 300px */
-    height: 300px; /* Increased from 200px */
+    width: 600px; /* Scaled down for smaller screens */
+    height: 400px;
   }
   .car {
-    font-size: 2rem; /* Increased from 1.5rem */
+    font-size: 2.5rem;
   }
   .finish-line {
-    font-size: 2rem; /* Increased from 1.5rem */
+    font-size: 2.5rem;
+  }
+  .progress-indicators {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .race-track {
+    width: 400px; /* Further scaled down for mobile */
+    height: 300px;
+  }
+  .car {
+    font-size: 2rem;
+  }
+  .finish-line {
+    font-size: 2rem;
+  }
+  .progress-indicators {
+    display: none;
   }
 }
