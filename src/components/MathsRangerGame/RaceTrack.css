@@ -79,11 +79,6 @@
   animation: playerGlow 2s ease-in-out infinite alternate;
 }
 
-.vehicle.player::before {
-  content: "\1F699"; /* 🚙 */
-  font-size: 2.2rem; /* Increased size for user car emoji */
-}
-
 /* AI Car */
 .vehicle.ai-car {
   background: linear-gradient(45deg, #2196f3, #1976d2);
@@ -308,7 +303,7 @@
   background: rgba(30, 30, 60, 0.98);
   color: #fff;
   border-radius: 24px 24px 32px 32px;
-  padding: 24px 56px 32px 56px;
+  padding: 24px 56px 8px 56px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 8px 24px 0 #00eaff44;
   display: flex;
   flex-direction: column;

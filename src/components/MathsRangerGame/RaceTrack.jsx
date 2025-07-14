@@ -22,6 +22,7 @@ const RaceTrack = ({
 
   // Initialize vehicles with player and AI
   useEffect(() => {
+    // Only initialize vehicles on first mount
     // Generate random starting positions for AI vehicles
     const aiStartPositions = [
       RACE_DISTANCE - Math.random() * 60,
@@ -41,17 +42,17 @@ const RaceTrack = ({
         id: "player",
         type: "player",
         position: RACE_DISTANCE, // Start from right side
-        speed: playerSpeed + 0.2, // Slightly increased base speed
+        speed: playerSpeed + 0.25, // Slightly increased base speed
         currentLap: 1,
         direction: "left", // Start going left
         totalDistance: 0,
-        emoji: "🏎️",
+        emoji: "🚙",
       },
       {
         id: "ai-car",
         type: "ai-car",
         position: aiStartPositions[0],
-        speed: 1.8 + Math.random() * 0.5,
+        speed: 1.7 + Math.random() * 0.3,
         currentLap: 1,
         direction: "left",
         totalDistance: 0,
@@ -61,7 +62,7 @@ const RaceTrack = ({
         id: "ai-bus",
         type: "ai-bus",
         position: aiStartPositions[1],
-        speed: 1.5 + Math.random() * 0.4,
+        speed: 1.5 + Math.random() * 0.8,
         currentLap: 1,
         direction: "left",
         totalDistance: 0,
@@ -71,7 +72,7 @@ const RaceTrack = ({
         id: "ai-truck",
         type: "ai-truck",
         position: aiStartPositions[2],
-        speed: 1.6 + Math.random() * 0.3,
+        speed: 1.6 + Math.random() * 0.8,
         currentLap: 1,
         direction: "left",
         totalDistance: 0,
@@ -79,7 +80,8 @@ const RaceTrack = ({
       },
     ];
     setVehicles(initialVehicles);
-  }, [RACE_DISTANCE]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Update track width on resize
   useEffect(() => {
@@ -192,14 +194,10 @@ const RaceTrack = ({
 
   const getVehicleStyle = (vehicle) => {
     const leftPosition = 40 + vehicle.position;
-    // Player car always faces right
     let transform = "scaleX(1)";
-    if (vehicle.id !== "player") {
-      if (vehicle.direction === "right") {
-        transform = "scaleX(-1)";
-      } else {
-        transform = "scaleX(1)";
-      }
+    // Flip any vehicle (player or AI) when moving right
+    if (vehicle.direction === "right") {
+      transform = "scaleX(-1)";
     }
     return {
       left: `${leftPosition}px`,
@@ -211,7 +209,7 @@ const RaceTrack = ({
     let classes = `vehicle ${vehicle.type}`;
 
     if (vehicle.id === "player") {
-      if (vehicle.speed > 2) {
+      if (vehicle.speed > 2 && !nitroActive) {
         classes += " nitro-boost";
       } else if (vehicle.speed < 1) {
         classes += " slow-down";
@@ -287,6 +285,9 @@ const RaceTrack = ({
               height: "30px",
             }}
           >
+            {vehicle.id === "player" && (
+              <span style={{ fontSize: "2.2rem" }}>{vehicle.emoji}</span>
+            )}
             {/* Removed 💨 emoji for nitro boost */}
           </div>
 
