@@ -1,0 +1,83 @@
+.floating-islands-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floating-island {
+  position: absolute;
+  animation: float 8s ease-in-out infinite;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.floating-island.large {
+  font-size: 4rem;
+  animation-duration: 10s;
+}
+
+.floating-island.medium {
+  font-size: 3rem;
+  animation-duration: 8s;
+}
+
+.floating-island.small {
+  font-size: 2rem;
+  animation-duration: 6s;
+}
+
+.floating-island.cloud {
+  font-size: 3.5rem;
+  opacity: 0.4;
+  animation-duration: 12s;
+}
+
+.floating-island.star {
+  font-size: 1.8rem;
+  animation: sparkle 4s ease-in-out infinite;
+  opacity: 0.8;
+}
+
+.gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(135, 206, 235, 0.1) 0%,
+    rgba(152, 251, 152, 0.1) 25%,
+    rgba(255, 228, 181, 0.1) 50%,
+    rgba(221, 160, 221, 0.1) 75%,
+    rgba(255, 182, 193, 0.1) 100%
+  );
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .floating-island.large {
+    font-size: 3rem;
+  }
+
+  .floating-island.medium {
+    font-size: 2.5rem;
+  }
+
+  .floating-island.small {
+    font-size: 1.5rem;
+  }
+
+  .floating-island.cloud {
+    font-size: 2.5rem;
+  }
+
+  .floating-island.star {
+    font-size: 1.3rem;
+  }
+}
