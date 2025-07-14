@@ -135,6 +135,15 @@ const RaceTrack = ({
     };
   }, [playerSpeed]);
 
+  // Immediately update player speed when playerSpeed prop changes
+  useEffect(() => {
+    setVehicles((prev) =>
+      prev.map((vehicle) =>
+        vehicle.type === "player" ? { ...vehicle, speed: playerSpeed } : vehicle
+      )
+    );
+  }, [playerSpeed]);
+
   // Update vehicle positions
   useEffect(() => {
     const updatePositions = () => {
