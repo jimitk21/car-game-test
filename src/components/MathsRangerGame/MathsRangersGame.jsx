@@ -8,14 +8,20 @@ import "./MathsRangersGame.css";
 const MathsRangersGame = () => {
   const [gameState, setGameState] = useState("ready"); // ready, playing, finished
   const [playerPosition, setPlayerPosition] = useState(0);
-  const [aiCarsPositions, setAiCarsPositions] = useState([0, 0, 0]);
+  const [aiVehicles, setAiVehicles] = useState([
+    { type: "car", position: 0, speed: 1 },
+    { type: "bus", position: 0, speed: 1 },
+    { type: "truck", position: 0, speed: 1 },
+  ]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [score, setScore] = useState(0);
   const [playerSpeed, setPlayerSpeed] = useState(1);
-  const [gameTime, setGameTime] = useState(0);
+  const [gameTime, setGameTime] = useState(0); // elapsed time in tenths of a second
   const [winner, setWinner] = useState(null);
   const [feedback, setFeedback] = useState("");
+  const [timeLimit, setTimeLimit] = useState(2400); // in tenths of a second (default 4 min)
   const gameLoopRef = useRef();
+  const nitroTimeoutRef = useRef();
 
   // Generate random math questions
   const generateQuestion = () => {
@@ -67,26 +73,39 @@ const MathsRangersGame = () => {
   const startGame = () => {
     setGameState("playing");
     setPlayerPosition(0);
-    setAiCarsPositions([0, 0, 0]);
+    setAiVehicles([
+      { type: "car", position: 0, speed: 1 },
+      { type: "bus", position: 0, speed: 1 },
+      { type: "truck", position: 0, speed: 1 },
+    ]);
     setScore(0);
     setPlayerSpeed(1);
     setGameTime(0);
     setWinner(null);
     setCurrentQuestion(generateQuestion());
+    // Set fixed time limit to 5 minutes (3000 tenths of a second)
+    setTimeLimit(3000);
   };
 
   const handleAnswer = (selectedAnswer) => {
     if (selectedAnswer === currentQuestion.answer) {
       setScore((prev) => prev + 10);
-      setPlayerSpeed(3); // Nitro boost
+      setPlayerSpeed(3.2); // Nitro boost
       setFeedback("🎉 Correct! Nitro Boost Activated! 🚀");
-      setTimeout(() => setPlayerSpeed(1.5), 2000); // Return to normal speed after 2 seconds
+      // Fix: Always clear previous nitro timeout before setting a new one
+      if (nitroTimeoutRef.current) {
+        clearTimeout(nitroTimeoutRef.current);
+      }
+      nitroTimeoutRef.current = setTimeout(() => setPlayerSpeed(1.7), 2000); // Return to slightly higher normal speed after 2 seconds
     } else {
       setPlayerSpeed(0.5); // Slow down
       setFeedback(
         `❌ Oops! Your car is slowing down... The answer was ${currentQuestion.answer}`
       );
-      setTimeout(() => setPlayerSpeed(1), 1500); // Return to normal speed after 1.5 seconds
+      if (nitroTimeoutRef.current) {
+        clearTimeout(nitroTimeoutRef.current);
+      }
+      nitroTimeoutRef.current = setTimeout(() => setPlayerSpeed(1.2), 1500); // Return to slightly higher normal speed after 1.5 seconds
     }
     setTimeout(() => {
       setCurrentQuestion(generateQuestion());
@@ -98,7 +117,14 @@ const MathsRangersGame = () => {
   useEffect(() => {
     if (gameState === "playing") {
       gameLoopRef.current = setInterval(() => {
-        setGameTime((prev) => prev + 1);
+        setGameTime((prev) => {
+          if (prev + 1 >= timeLimit) {
+            setGameState("finished");
+            setWinner((w) => w || "time");
+            return timeLimit;
+          }
+          return prev + 1;
+        });
 
         // Move player car
         setPlayerPosition((prev) => {
@@ -112,16 +138,21 @@ const MathsRangersGame = () => {
         });
 
         // Move AI cars
-        setAiCarsPositions((prev) =>
-          prev.map((pos, index) => {
-            const speed = 0.8 + index * 0.2 + Math.random() * 0.3;
-            const newPos = pos + speed;
+        setAiVehicles((prev) =>
+          prev.map((vehicle, index) => {
+            // Each vehicle has a base speed and a random factor
+            let base = 1 + index * 0.15;
+            let random = Math.random() * 0.5 - 0.2; // -0.2 to +0.3
+            let speed = base + random;
+            // Sometimes, one vehicle gets a burst
+            if (Math.random() < 0.05) speed += 0.7;
+            const newPos = vehicle.position + speed;
             if (newPos >= 1800 && !winner) {
-              setWinner(`ai-${index}`);
+              setWinner(vehicle.type);
               setGameState("finished");
-              return 1800;
+              return { ...vehicle, position: 1800 };
             }
-            return newPos;
+            return { ...vehicle, position: newPos };
           })
         );
       }, 100);
@@ -132,7 +163,16 @@ const MathsRangersGame = () => {
         clearInterval(gameLoopRef.current);
       }
     };
-  }, [gameState, playerSpeed, winner]);
+  }, [gameState, playerSpeed, winner, timeLimit]);
+
+  // Clean up nitro timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (nitroTimeoutRef.current) {
+        clearTimeout(nitroTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const resetGame = () => {
     setGameState("ready");
@@ -148,7 +188,9 @@ const MathsRangersGame = () => {
         {feedback && <div className="game-feedback-top">{feedback}</div>}
         <div className="game-stats">
           <span className="score">Score: {score}</span>
-          <span className="time">Time: {Math.floor(gameTime / 10)}s</span>
+          <span className="time">
+            Time Left: {Math.max(0, ((timeLimit - gameTime) / 10).toFixed(1))}s
+          </span>
         </div>
       </div>
 
@@ -171,7 +213,7 @@ const MathsRangersGame = () => {
         <>
           <RaceTrack
             playerPosition={playerPosition}
-            aiCarsPositions={aiCarsPositions}
+            aiVehicles={aiVehicles}
             playerSpeed={playerSpeed}
           />
           <MathQuestion question={currentQuestion} onAnswer={handleAnswer} />
@@ -188,16 +230,28 @@ const MathsRangersGame = () => {
                 </h2>
                 <div className="victory-stats">
                   <p>Final Score: {score}</p>
-                  <p>Time: {Math.floor(gameTime / 10)} seconds</p>
+                  <p>
+                    Time: {(gameTime / 10).toFixed(1)} seconds
+                    {winner === "time" && " (Time Up!)"}
+                  </p>
                 </div>
               </>
             ) : (
               <>
-                <h2 className="defeat-message">Good try, Deputy! 🤠</h2>
-                <p>Keep practicing your math skills and try again!</p>
+                <h2 className="defeat-message">
+                  {winner === "time" ? "⏰ Time's Up!" : "Good try, Deputy! 🤠"}
+                </h2>
+                <p>
+                  {winner === "time"
+                    ? "You ran out of time! Try to answer faster next time."
+                    : "Keep practicing your math skills and try again!"}
+                </p>
                 <div className="defeat-stats">
                   <p>Score: {score}</p>
-                  <p>Time: {Math.floor(gameTime / 10)} seconds</p>
+                  <p>
+                    Time: {(gameTime / 10).toFixed(1)} seconds
+                    {winner === "time" && " (Time Up!)"}
+                  </p>
                 </div>
               </>
             )}

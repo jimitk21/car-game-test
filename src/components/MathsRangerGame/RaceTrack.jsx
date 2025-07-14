@@ -1,119 +1,250 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
 import "./RaceTrack.css";
 
-const RaceTrack = ({ playerPosition, aiCarsPositions, playerSpeed }) => {
-  const getCarStyle = (position, carIndex = 0) => {
-    // Calculate position along the rectangular track
-    const trackLength = 1800;
-    const normalizedPos = (position % trackLength) / trackLength;
+const RaceTrack = ({ playerPosition, aiVehicles, playerSpeed }) => {
+  const [trackWidth, setTrackWidth] = useState(800);
+  const [vehicles, setVehicles] = useState([]);
+  const [raceCompleted, setRaceCompleted] = useState(false);
+  const speedChangeRef = useRef();
+  const trackRef = useRef();
 
-    // Track dimensions - bigger horizontal track
-    const trackWidth = 680;
-    const trackHeight = 380;
-    const cornerRadius = 80;
+  // Track dimensions and lap configuration
+  const TOTAL_LAPS = 2;
+  const TRACK_PADDING = 80; // Space from edges
+  const RACE_DISTANCE = trackWidth - TRACK_PADDING;
 
-    // Lane configuration - 4 separate lanes
-    const laneWidth = 25;
-    const laneSpacing = 35;
+  // Initialize vehicles with player and AI
+  useEffect(() => {
+    const initialVehicles = [
+      {
+        id: "player",
+        type: "player",
+        position: RACE_DISTANCE, // Start from right side
+        speed: playerSpeed + 0.2, // Slightly increased base speed
+        currentLap: 1,
+        direction: "left", // Start going left
+        totalDistance: 0,
+        emoji: "🏎️",
+      },
+      {
+        id: "ai-car",
+        type: "ai-car",
+        position: RACE_DISTANCE, // Start from right side
+        speed: 1.8 + Math.random() * 0.5,
+        currentLap: 1,
+        direction: "left", // Start going left
+        totalDistance: 0,
+        emoji: "🚗",
+      },
+      {
+        id: "ai-bus",
+        type: "ai-bus",
+        position: RACE_DISTANCE, // Start from right side
+        speed: 1.5 + Math.random() * 0.4,
+        currentLap: 1,
+        direction: "left", // Start going left
+        totalDistance: 0,
+        emoji: "🚌",
+      },
+      {
+        id: "ai-truck",
+        type: "ai-truck",
+        position: RACE_DISTANCE, // Start from right side
+        speed: 1.6 + Math.random() * 0.3,
+        currentLap: 1,
+        direction: "left", // Start going left
+        totalDistance: 0,
+        emoji: "🚚",
+      },
+    ];
+    setVehicles(initialVehicles);
+  }, [RACE_DISTANCE]);
 
-    // Calculate lane offset from the outer edge
-    const baseLaneOffset = 50; // Distance from track edge
-    const laneOffset = baseLaneOffset + carIndex * laneSpacing;
+  // Update track width on resize
+  useEffect(() => {
+    const updateTrackWidth = () => {
+      if (trackRef.current) {
+        setTrackWidth(trackRef.current.offsetWidth);
+      }
+    };
 
-    let x,
-      y,
-      rotation = 0;
+    updateTrackWidth();
+    window.addEventListener("resize", updateTrackWidth);
+    return () => window.removeEventListener("resize", updateTrackWidth);
+  }, []);
 
-    if (normalizedPos <= 0.25) {
-      // Top straight - moving LEFT (from right to left)
-      const progress = normalizedPos / 0.25;
-      x =
-        trackWidth - cornerRadius - progress * (trackWidth - 2 * cornerRadius);
-      y = laneOffset;
-      rotation = 180; // Facing left
-    } else if (normalizedPos <= 0.5) {
-      // Left curve - turning DOWN
-      const progress = (normalizedPos - 0.25) / 0.25;
-      const angle = (progress * Math.PI) / 2;
-      const radius = cornerRadius + laneOffset;
-      x = cornerRadius - radius * Math.cos(angle);
-      y = cornerRadius + radius * Math.sin(angle);
-      rotation = 180 + progress * 90; // 180° to 270°
-    } else if (normalizedPos <= 0.75) {
-      // Bottom straight - moving RIGHT (from left to right)
-      const progress = (normalizedPos - 0.5) / 0.25;
-      x = cornerRadius + progress * (trackWidth - 2 * cornerRadius);
-      y = trackHeight - laneOffset;
-      rotation = 0; // Facing right
-    } else {
-      // Right curve - turning UP
-      const progress = (normalizedPos - 0.75) / 0.25;
-      const angle = (progress * Math.PI) / 2;
-      const radius = cornerRadius + laneOffset;
-      x = trackWidth - cornerRadius + radius * Math.cos(angle);
-      y = trackHeight - cornerRadius - radius * Math.sin(angle);
-      rotation = progress * 90; // 0° to 90°
+  // AI speed variation every 2 seconds
+  useEffect(() => {
+    speedChangeRef.current = setInterval(() => {
+      setVehicles((prev) =>
+        prev.map((vehicle) => {
+          if (vehicle.type === "player") {
+            // Slightly increase the user car speed
+            return { ...vehicle, speed: playerSpeed + 0.15 };
+          }
+
+          // Small speed variations for AI
+          let baseSpeed;
+          switch (vehicle.type) {
+            case "ai-car":
+              baseSpeed = 1.8;
+              break;
+            case "ai-bus":
+              baseSpeed = 1.5;
+              break;
+            case "ai-truck":
+              baseSpeed = 1.6;
+              break;
+            default:
+              baseSpeed = 1.5;
+          }
+
+          const speedVariation = (Math.random() - 0.5) * 0.4; // ±0.2 variation
+          const newSpeed = Math.max(0.8, baseSpeed + speedVariation);
+
+          return { ...vehicle, speed: newSpeed };
+        })
+      );
+    }, 2000);
+
+    return () => {
+      if (speedChangeRef.current) {
+        clearInterval(speedChangeRef.current);
+      }
+    };
+  }, [playerSpeed]);
+
+  // Update vehicle positions
+  useEffect(() => {
+    const updatePositions = () => {
+      setVehicles((prev) =>
+        prev.map((vehicle) => {
+          const newVehicle = { ...vehicle };
+
+          // Update position based on direction and speed
+          if (vehicle.direction === "left") {
+            newVehicle.position -= vehicle.speed;
+            newVehicle.totalDistance += vehicle.speed;
+
+            // Check if reached the start (left side)
+            if (newVehicle.position <= 0) {
+              newVehicle.position = 0;
+              newVehicle.direction = "right";
+            }
+          } else {
+            newVehicle.position += vehicle.speed;
+            newVehicle.totalDistance += vehicle.speed;
+
+            // Check if reached the end (right side)
+            if (newVehicle.position >= RACE_DISTANCE) {
+              newVehicle.position = RACE_DISTANCE;
+              newVehicle.direction = "left";
+              newVehicle.currentLap += 1;
+            }
+          }
+
+          return newVehicle;
+        })
+      );
+    };
+
+    const interval = setInterval(updatePositions, 50);
+    return () => clearInterval(interval);
+  }, [RACE_DISTANCE]);
+
+  // Check for race completion
+  useEffect(() => {
+    const winner = vehicles.find((v) => v.currentLap > TOTAL_LAPS);
+    if (winner && !raceCompleted) {
+      setRaceCompleted(true);
     }
+  }, [vehicles, raceCompleted]);
 
+  const getVehicleStyle = (vehicle) => {
+    const leftPosition = 40 + vehicle.position;
+    // Only flip horizontally when going right (opposite of before)
+    let transform = "";
+    if (vehicle.direction === "right") {
+      transform = "scaleX(-1)"; // Flip when going right
+    } else {
+      transform = "scaleX(1)"; // Normal when going left
+    }
     return {
-      left: `${x}px`,
-      top: `${y}px`,
-      transform: `rotate(${rotation}deg) ${
-        playerSpeed > 2 ? "scale(1.1)" : ""
-      }`,
+      left: `${leftPosition}px`,
+      transform,
     };
   };
 
+  const getVehicleClasses = (vehicle) => {
+    let classes = `vehicle ${vehicle.type}`;
+
+    if (vehicle.id === "player") {
+      if (playerSpeed > 2) {
+        classes += " nitro-boost";
+      } else if (playerSpeed < 1) {
+        classes += " slow-down";
+      }
+    }
+
+    return classes;
+  };
+
+  const getProgressPercentage = (vehicle) => {
+    const totalRaceDistance = RACE_DISTANCE * 2 * TOTAL_LAPS;
+    const currentProgress =
+      (vehicle.currentLap - 1) * RACE_DISTANCE * 2 +
+      (vehicle.direction === "left"
+        ? RACE_DISTANCE - vehicle.position
+        : vehicle.position);
+    return Math.min(100, (currentProgress / totalRaceDistance) * 100);
+  };
+
   return (
-    <div className="race-track-container">
-      <div className="race-track">
-        <div className="track-border">
-          <div className="track-inner">
-            <div className="finish-line">🏁</div>
-            {/* Player Car - Outermost lane (lane 0) */}
-            <div
-              className={`car player-car ${
-                playerSpeed > 2
-                  ? "nitro-boost"
-                  : playerSpeed < 1
-                  ? "slowed"
-                  : ""
-              }`}
-              style={getCarStyle(playerPosition, 0)}
-            >
-              🏎️
-            </div>
-            {/* AI Cars - Each in their own lane */}
-            {aiCarsPositions.map((position, index) => (
-              <div
-                key={index}
-                className={`car ai-car ai-car-${index}`}
-                style={getCarStyle(position, index + 1)}
-              >
-                🚗
-              </div>
-            ))}
-          </div>
-        </div>
+    <div className="race-track" ref={trackRef}>
+      {/* Start and Finish Lines */}
+      <div className="start-line"></div>
+      <div className="finish-line"></div>
+
+      {/* Lap Counter */}
+      <div className="lap-counter">
+        Player: Lap{" "}
+        {Math.min(
+          vehicles.find((v) => v.id === "player")?.currentLap || 1,
+          TOTAL_LAPS
+        )}
+        /{TOTAL_LAPS}
       </div>
 
-      {/* Starting line indicator */}
-      <div
-        className="progress-indicators"
-        style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}
-      >
-        <div
-          style={{
-            background: "rgba(255, 255, 255, 0.9)",
-            padding: "10px 20px",
-            borderRadius: "15px",
-            fontSize: "1.2rem",
-            fontWeight: "bold",
-            color: "#333",
-          }}
-        >
-          🏁 Race to the Finish Line! 🏁
+      {/* Direction Indicators */}
+      <div className="direction-indicator left">←</div>
+      <div className="direction-indicator right">→</div>
+
+      {/* Race Lanes */}
+      {vehicles.map((vehicle, index) => (
+        <div key={vehicle.id} className="race-lane">
+          <div className="lane-label">
+            {vehicle.id === "player" ? "YOU" : vehicle.type.toUpperCase()}
+          </div>
+
+          <div
+            className={getVehicleClasses(vehicle)}
+            style={getVehicleStyle(vehicle)}
+          ></div>
+
+          {/* Individual Progress Bar */}
+          <div className="race-progress">
+            <div
+              className="progress-fill"
+              style={{ width: `${getProgressPercentage(vehicle)}%` }}
+            ></div>
+          </div>
         </div>
-      </div>
+      ))}
+
+      {/* Race Status */}
+      {raceCompleted && <div className="race-status">Race Complete!</div>}
     </div>
   );
 };

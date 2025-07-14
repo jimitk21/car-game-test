@@ -1,177 +1,300 @@
-.race-track-container {
-  margin: 20px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
+/* Race Track Container */
 .race-track {
-  position: relative;
-  width: 800px; /* Increased from 600px for more horizontal space */
-  height: 500px; /* Increased from 400px */
-  margin-bottom: 20px;
-}
-
-.track-border {
   width: 100%;
-  height: 100%;
-  background: #8b4513;
-  border-radius: 100px; /* Increased for the larger track */
-  padding: 40px; /* Increased padding */
+  height: 400px;
+  background: linear-gradient(to bottom, #4caf50 0%, #45a049 100%);
+  border-radius: 20px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   position: relative;
-}
-
-.track-inner {
-  width: 100%;
-  height: 100%;
-  background: #228b22;
-  border-radius: 60px; /* Increased for the larger track */
-  position: relative;
   overflow: hidden;
+  margin: 20px 0;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* Lane dividers to show separate tracks */
-.track-inner::before {
+/* Track Background Pattern */
+.race-track::before {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% - 80px);
-  height: calc(100% - 80px);
-  border: 4px dashed #ffff00;
-  border-radius: 40px;
-  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 48px,
+    rgba(255, 255, 255, 0.1) 50px,
+    rgba(255, 255, 255, 0.1) 52px
+  );
+  pointer-events: none;
 }
 
-/* Individual lane markers */
-.track-inner::after {
-  content: "";
+/* Individual Lane */
+.race-lane {
+  width: 100%;
+  height: 80px;
+  position: relative;
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.race-lane:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* Lane Labels */
+.lane-label {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% - 160px);
-  height: calc(100% - 160px);
-  border: 2px dashed #ffff00;
-  border-radius: 20px;
-  z-index: 1;
+  left: 10px;
+  top: 5px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
 }
 
+/* Vehicle Base Styles */
+.vehicle {
+  position: absolute;
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Player Sports Car */
+.vehicle.player {
+  background: linear-gradient(45deg, #ff6b35, #f7931e);
+  border: 3px solid #ff4500;
+  animation: playerGlow 2s ease-in-out infinite alternate;
+}
+
+.vehicle.player::before {
+  content: "\1F699"; /* 🚙 */
+  font-size: 2.2rem; /* Increased size for user car emoji */
+}
+
+/* AI Car */
+.vehicle.ai-car {
+  background: linear-gradient(45deg, #2196f3, #1976d2);
+  border: 2px solid #0d47a1;
+}
+
+.vehicle.ai-car::before {
+  content: "🚗";
+}
+
+/* AI Bus */
+.vehicle.ai-bus {
+  background: linear-gradient(45deg, #ff9800, #f57c00);
+  border: 2px solid #e65100;
+  width: 80px;
+}
+
+.vehicle.ai-bus::before {
+  content: "🚌";
+}
+
+/* AI Truck */
+.vehicle.ai-truck {
+  background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+  border: 2px solid #4a148c;
+  width: 70px;
+}
+
+.vehicle.ai-truck::before {
+  content: "🚚";
+}
+
+/* Nitro Boost Effect */
+.vehicle.nitro-boost {
+  animation: nitroBoost 0.5s ease-in-out infinite alternate;
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+}
+
+/* Slow Down Effect */
+.vehicle.slow-down {
+  filter: grayscale(50%);
+  animation: slowDown 0.5s ease-in-out infinite alternate;
+}
+
+/* Lap Counter */
+.lap-counter {
+  position: absolute;
+  top: 0px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  z-index: 20;
+}
+
+/* Start Line - Now on the right side */
+.start-line {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  bottom: 20px;
+  width: 4px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #4caf50 0px,
+    #4caf50 10px,
+    #fff 10px,
+    #fff 20px
+  );
+  z-index: 10;
+}
+
+/* Finish Line - Now on the left side */
 .finish-line {
   position: absolute;
-  top: 40px;
-  right: 50px;
-  font-size: 3rem;
-  z-index: 2;
-  animation: wave 2s ease-in-out infinite;
+  left: 20px;
+  top: 20px;
+  bottom: 20px;
+  width: 4px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #ff6b35 0px,
+    #ff6b35 10px,
+    #fff 10px,
+    #fff 20px
+  );
+  z-index: 10;
 }
 
-.car {
+/* Direction Indicators */
+.direction-indicator {
   position: absolute;
-  font-size: 3rem; /* Increased from 2.5rem */
-  z-index: 3;
-  transition: all 0.1s ease;
-  transform-origin: center;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 1;
 }
 
-.player-car {
-  filter: drop-shadow(0 0 10px #ffd700);
+.direction-indicator.left {
+  left: 50px;
 }
 
-.player-car.nitro-boost {
-  animation: nitro 0.5s ease-in-out;
-  filter: drop-shadow(0 0 15px #ff4500);
+.direction-indicator.right {
+  right: 50px;
 }
 
-.player-car.slowed {
-  filter: drop-shadow(0 0 5px #666);
-  opacity: 0.8;
-}
-
-.ai-car-0 {
-  filter: drop-shadow(0 0 5px #ff0000);
-}
-
-.ai-car-1 {
-  filter: drop-shadow(0 0 5px #0000ff);
-}
-
-.ai-car-2 {
-  filter: drop-shadow(0 0 5px #800080);
-}
-
-.progress-indicators {
-  display: none;
-}
-
-.progress-bar {
-  display: none;
-}
-
-.progress-label {
-  display: none;
-}
-
-.progress-fill {
-  display: none;
-}
-
-.ai-fill {
-  display: none;
-}
-
-@keyframes wave {
-  0%,
+/* Animations */
+@keyframes playerGlow {
+  0% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
   100% {
-    transform: translateX(-50%) rotate(-5deg);
-  }
-  50% {
-    transform: translateX(-50%) rotate(5deg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 107, 53, 0.5);
   }
 }
 
-@keyframes nitro {
+@keyframes nitroBoost {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+  }
+  100% {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255, 107, 53, 1);
+  }
+}
+
+@keyframes slowDown {
   0% {
     transform: scale(1);
   }
-  50% {
-    transform: scale(1.2);
-  }
   100% {
-    transform: scale(1);
+    transform: scale(0.9);
   }
 }
 
-@media (max-width: 900px) {
-  .race-track {
-    width: 600px; /* Scaled down for smaller screens */
-    height: 400px;
-  }
-  .car {
-    font-size: 2.5rem;
-  }
-  .finish-line {
-    font-size: 2.5rem;
-  }
-  .progress-indicators {
-    display: none;
-  }
+/* Race Progress Bar */
+.race-progress {
+  position: absolute;
+  bottom: 10px;
+  left: 20px;
+  right: 20px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
   .race-track {
-    width: 400px; /* Further scaled down for mobile */
-    height: 300px;
+    height: 320px;
+    padding: 15px;
   }
-  .car {
-    font-size: 2rem;
+
+  .race-lane {
+    height: 65px;
   }
-  .finish-line {
-    font-size: 2rem;
+
+  .vehicle {
+    width: 50px;
+    height: 25px;
+    font-size: 1.2rem;
   }
-  .progress-indicators {
-    display: none;
+
+  .vehicle.ai-bus {
+    width: 65px;
+  }
+
+  .vehicle.ai-truck {
+    width: 58px;
+  }
+
+  .lap-counter {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .race-track {
+    height: 280px;
+    padding: 10px;
+  }
+
+  .race-lane {
+    height: 55px;
+  }
+
+  .vehicle {
+    width: 40px;
+    height: 20px;
+    font-size: 1rem;
+  }
+
+  .vehicle.ai-bus {
+    width: 55px;
+  }
+
+  .vehicle.ai-truck {
+    width: 48px;
   }
 }
