@@ -3,7 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import "./RaceTrack.css";
 
-const RaceTrack = ({ playerPosition, aiVehicles, playerSpeed }) => {
+const RaceTrack = ({
+  playerPosition,
+  aiVehicles,
+  playerSpeed,
+  nitroActive,
+}) => {
   const [trackWidth, setTrackWidth] = useState(800);
   const [vehicles, setVehicles] = useState([]);
   const [raceCompleted, setRaceCompleted] = useState(false);
@@ -17,6 +22,20 @@ const RaceTrack = ({ playerPosition, aiVehicles, playerSpeed }) => {
 
   // Initialize vehicles with player and AI
   useEffect(() => {
+    // Generate random starting positions for AI vehicles
+    const aiStartPositions = [
+      RACE_DISTANCE - Math.random() * 60,
+      RACE_DISTANCE - 60 - Math.random() * 60,
+      RACE_DISTANCE - 120 - Math.random() * 60,
+    ];
+    // Shuffle the positions so any AI can be ahead
+    for (let i = aiStartPositions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [aiStartPositions[i], aiStartPositions[j]] = [
+        aiStartPositions[j],
+        aiStartPositions[i],
+      ];
+    }
     const initialVehicles = [
       {
         id: "player",
@@ -31,30 +50,30 @@ const RaceTrack = ({ playerPosition, aiVehicles, playerSpeed }) => {
       {
         id: "ai-car",
         type: "ai-car",
-        position: RACE_DISTANCE, // Start from right side
+        position: aiStartPositions[0],
         speed: 1.8 + Math.random() * 0.5,
         currentLap: 1,
-        direction: "left", // Start going left
+        direction: "left",
         totalDistance: 0,
         emoji: "🚗",
       },
       {
         id: "ai-bus",
         type: "ai-bus",
-        position: RACE_DISTANCE, // Start from right side
+        position: aiStartPositions[1],
         speed: 1.5 + Math.random() * 0.4,
         currentLap: 1,
-        direction: "left", // Start going left
+        direction: "left",
         totalDistance: 0,
         emoji: "🚌",
       },
       {
         id: "ai-truck",
         type: "ai-truck",
-        position: RACE_DISTANCE, // Start from right side
+        position: aiStartPositions[2],
         speed: 1.6 + Math.random() * 0.3,
         currentLap: 1,
-        direction: "left", // Start going left
+        direction: "left",
         totalDistance: 0,
         emoji: "🚚",
       },
@@ -81,8 +100,8 @@ const RaceTrack = ({ playerPosition, aiVehicles, playerSpeed }) => {
       setVehicles((prev) =>
         prev.map((vehicle) => {
           if (vehicle.type === "player") {
-            // Slightly increase the user car speed
-            return { ...vehicle, speed: playerSpeed + 0.15 };
+            // Set the user car speed to match the prop exactly
+            return { ...vehicle, speed: playerSpeed };
           }
 
           // Small speed variations for AI
@@ -181,9 +200,9 @@ const RaceTrack = ({ playerPosition, aiVehicles, playerSpeed }) => {
     let classes = `vehicle ${vehicle.type}`;
 
     if (vehicle.id === "player") {
-      if (playerSpeed > 2) {
+      if (vehicle.speed > 2) {
         classes += " nitro-boost";
-      } else if (playerSpeed < 1) {
+      } else if (vehicle.speed < 1) {
         classes += " slow-down";
       }
     }
@@ -192,13 +211,24 @@ const RaceTrack = ({ playerPosition, aiVehicles, playerSpeed }) => {
   };
 
   const getProgressPercentage = (vehicle) => {
-    const totalRaceDistance = RACE_DISTANCE * 2 * TOTAL_LAPS;
-    const currentProgress =
-      (vehicle.currentLap - 1) * RACE_DISTANCE * 2 +
-      (vehicle.direction === "left"
-        ? RACE_DISTANCE - vehicle.position
-        : vehicle.position);
-    return Math.min(100, (currentProgress / totalRaceDistance) * 100);
+    // Progress is 0% at the initial rightmost position (lap 1, direction left)
+    // 50% at leftmost (lap 1, direction right)
+    // 100% at rightmost after last lap
+    const lapsCompleted = vehicle.currentLap - 1;
+    let segmentProgress = 0;
+    if (vehicle.direction === "left") {
+      // Moving left: from right (RACE_DISTANCE) to left (0)
+      segmentProgress = (RACE_DISTANCE - vehicle.position) / RACE_DISTANCE;
+    } else {
+      // Moving right: from left (0) to right (RACE_DISTANCE)
+      segmentProgress = vehicle.position / RACE_DISTANCE;
+    }
+    // Each lap is two segments (left and right)
+    const totalSegments = TOTAL_LAPS * 2;
+    const completedSegments =
+      lapsCompleted * 2 + (vehicle.direction === "left" ? 0 : 1);
+    const progress = (completedSegments + segmentProgress) / totalSegments;
+    return Math.min(100, Math.max(0, progress * 100));
   };
 
   return (
@@ -230,8 +260,18 @@ const RaceTrack = ({ playerPosition, aiVehicles, playerSpeed }) => {
 
           <div
             className={getVehicleClasses(vehicle)}
-            style={getVehicleStyle(vehicle)}
-          ></div>
+            style={{
+              ...getVehicleStyle(vehicle),
+              display: "flex",
+              flexDirection: "row-reverse",
+              alignItems: "center",
+              position: "absolute",
+              width: "60px",
+              height: "30px",
+            }}
+          >
+            {/* Removed 💨 emoji for nitro boost */}
+          </div>
 
           {/* Individual Progress Bar */}
           <div className="race-progress">
