@@ -256,42 +256,55 @@ const MathsRangersGame = ({ onExitGame }) => {
       gameLoopRef.current = setInterval(() => {
         setGameTime((prev) => {
           if (prev + 1 >= timeLimit) {
-            setGameState("finished");
-            setWinner((w) => w || "time");
+            // Do not end the game on time anymore
             return timeLimit;
           }
           return prev + 1;
         });
 
         // Move player car
-        setPlayerPosition((prev) => {
-          const newPos = prev + playerSpeed;
-          if (newPos >= 1800) {
-            setWinner("player");
-            setGameState("finished");
-            return 1800;
-          }
-          return newPos;
-        });
+        setPlayerPosition((prev) => prev + playerSpeed);
 
         // Move AI cars
         setAiVehicles((prev) =>
           prev.map((vehicle, index) => {
-            // Each vehicle has a base speed and a random factor
             let base = 1 + index * 0.15;
             let random = Math.random() * 0.5 - 0.2; // -0.2 to +0.3
             let speed = base + random;
-            // Sometimes, one vehicle gets a burst
             if (Math.random() < 0.05) speed += 0.7;
-            const newPos = vehicle.position + speed;
-            if (newPos >= 1800 && !winner) {
-              setWinner(vehicle.type);
-              setGameState("finished");
-              return { ...vehicle, position: 1800 };
-            }
-            return { ...vehicle, position: newPos };
+            return { ...vehicle, position: vehicle.position + speed };
           })
         );
+
+        // Check for winner by progress bar (position >= 1800)
+        setTimeout(() => {
+          // Get latest positions
+          let playerPos, aiPositions;
+          setPlayerPosition((p) => {
+            playerPos = p;
+            return p;
+          });
+          setAiVehicles((ai) => {
+            aiPositions = ai.map((v) => v.position);
+            return ai;
+          });
+
+          // Check if any car finished
+          if (
+            playerPos >= 1800 ||
+            (aiPositions && aiPositions.some((pos) => pos >= 1800))
+          ) {
+            setGameState("finished");
+            if (
+              playerPos >= 1800 &&
+              (!aiPositions || aiPositions.every((pos) => playerPos >= pos))
+            ) {
+              setWinner("player");
+            } else {
+              setWinner("ai");
+            }
+          }
+        }, 0);
       }, 100);
     }
 
@@ -300,7 +313,7 @@ const MathsRangersGame = ({ onExitGame }) => {
         clearInterval(gameLoopRef.current);
       }
     };
-  }, [gameState, playerSpeed, winner, timeLimit]);
+  }, [gameState, playerSpeed, timeLimit]);
 
   // Clean up all timeouts on unmount or game state change
   useEffect(() => {
@@ -400,28 +413,17 @@ const MathsRangersGame = ({ onExitGame }) => {
                 </h2>
                 <div className="victory-stats">
                   <p>Final Score: {score}</p>
-                  <p>
-                    Time: {(gameTime / 10).toFixed(1)} seconds
-                    {winner === "time" && " (Time Up!)"}
-                  </p>
+                  <p>Time: {(gameTime / 10).toFixed(1)} seconds</p>
                 </div>
               </>
             ) : (
               <>
                 <h2 className="defeat-message">
-                  {winner === "time" ? "⏰ Time's Up!" : "Good try, Deputy! 🤠"}
+                  Well tried chief, better luck next time!
                 </h2>
-                <p>
-                  {winner === "time"
-                    ? "You ran out of time! Try to answer faster next time."
-                    : "Keep practicing your math skills and try again!"}
-                </p>
                 <div className="defeat-stats">
                   <p>Score: {score}</p>
-                  <p>
-                    Time: {(gameTime / 10).toFixed(1)} seconds
-                    {winner === "time" && " (Time Up!)"}
-                  </p>
+                  <p>Time: {(gameTime / 10).toFixed(1)} seconds</p>
                 </div>
               </>
             )}
