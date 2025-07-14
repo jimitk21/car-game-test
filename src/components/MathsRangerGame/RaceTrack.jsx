@@ -244,6 +244,12 @@ const RaceTrack = ({
 
   return (
     <div className="race-track" ref={trackRef}>
+      {/* Nitro Activated Floating Card */}
+      {nitroActive && (
+        <div className="nitro-card-float">
+          <span className="nitro-title">Activate Nitro 🚀</span>
+        </div>
+      )}
       {/* Start and Finish Lines */}
       <div className="start-line"></div>
       <div className="finish-line"></div>
