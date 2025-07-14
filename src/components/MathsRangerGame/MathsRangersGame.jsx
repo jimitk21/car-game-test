@@ -11,7 +11,11 @@ const NITRO_DURATION = 2000;
 const SLOW_SPEED = 0.5;
 const SLOW_DURATION = 1500;
 
-const MathsRangersGame = () => {
+const MathsRangersGame = ({ onExitGame }) => {
+  const [musicOn, setMusicOn] = useState(true);
+  const [showHint, setShowHint] = useState(false);
+  const musicRef = useRef(null);
+  const nitroRef = useRef(null);
   const [gameState, setGameState] = useState("ready"); // ready, playing, finished
   const [playerPosition, setPlayerPosition] = useState(0);
   const [aiVehicles, setAiVehicles] = useState([
@@ -128,6 +132,49 @@ const MathsRangersGame = () => {
     }
   }, [nitroActive, nitroQueue]);
 
+  // Play/pause background music when toggled
+  useEffect(() => {
+    if (musicRef.current) {
+      musicRef.current.volume = 0.2; // Set background music volume low
+      if (musicOn) {
+        musicRef.current.play();
+      } else {
+        musicRef.current.pause();
+        musicRef.current.currentTime = 0;
+      }
+    }
+  }, [musicOn]);
+
+  // Play/pause music on mount/unmount
+  useEffect(() => {
+    if (musicRef.current) {
+      musicRef.current.volume = 0.2;
+      if (musicOn) {
+        musicRef.current.play();
+      }
+    }
+    return () => {
+      if (musicRef.current) {
+        musicRef.current.pause();
+        musicRef.current.currentTime = 0;
+      }
+    };
+  }, []);
+
+  // Context-sensitive hint text
+  const getCurrentGameHint = () => {
+    switch (gameState) {
+      case "ready":
+        return "Press 'Start Racing!' to begin your math adventure!";
+      case "playing":
+        return "Answer math questions correctly to boost your car and win the race! Use Nitro wisely!";
+      case "finished":
+        return "Try again to improve your score or race faster!";
+      default:
+        return "";
+    }
+  };
+
   const startGame = () => {
     setGameState("playing");
     setPlayerPosition(0);
@@ -159,7 +206,11 @@ const MathsRangersGame = () => {
 
     if (selectedAnswer === currentQuestion.answer) {
       setScore((prev) => prev + 10);
-
+      // Play nitro/horn sound
+      if (nitroRef.current) {
+        nitroRef.current.currentTime = 0;
+        nitroRef.current.play();
+      }
       if (nitroActive) {
         // Queue another nitro if one is already active
         setNitroQueue((prev) => prev + 1);
@@ -283,6 +334,19 @@ const MathsRangersGame = () => {
     setCurrentQuestion(null);
   };
 
+  // Exit Game Button (always visible)
+  // Style: fixed at bottom right, similar to ClockKingdom
+  // Only render if onExitGame is provided
+  const exitButton = onExitGame ? (
+    <button
+      className="exit-game-btn"
+      style={{ position: "fixed", bottom: 20, right: 20, zIndex: 10001 }}
+      onClick={onExitGame}
+    >
+      Exit Game
+    </button>
+  ) : null;
+
   return (
     <div className="maths-rangers-game">
       <div className="game-header">
@@ -371,6 +435,41 @@ const MathsRangersGame = () => {
             </div>
           </div>
         </div>
+      )}
+      {exitButton}
+
+      {/* Music Toggle Button */}
+      <audio
+        ref={musicRef}
+        src={"/src/assets/car-sound.mp3"}
+        loop
+        preload="auto"
+      />
+      <audio ref={nitroRef} src={"/src/assets/horn-nitro.mp3"} preload="auto" />
+      <div
+        className="music-toggle"
+        onClick={() => setMusicOn((on) => !on)}
+        title={musicOn ? "Turn music off" : "Turn music on"}
+      >
+        {musicOn ? "🎵" : "🔇"}
+      </div>
+
+      {/* Hint Button and Hint Display */}
+      {gameState !== "ready" && gameState !== "finished" && (
+        <>
+          <button
+            className="hint-button"
+            onClick={() => setShowHint((h) => !h)}
+          >
+            💡 Hint
+          </button>
+          {showHint && (
+            <div className="game-hint">
+              <div className="hint-icon">💡</div>
+              <div className="hint-text">{getCurrentGameHint()}</div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

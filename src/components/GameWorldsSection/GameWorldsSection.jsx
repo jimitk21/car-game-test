@@ -3,7 +3,7 @@
 import { useState } from "react";
 import "./GameWorldsSection.css";
 
-const GameWorldsSection = ({ onStartClockKingdom }) => {
+const GameWorldsSection = ({ onStartClockKingdom, onStartMathsRangers }) => {
   const [hoveredGame, setHoveredGame] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
 
@@ -103,6 +103,8 @@ const GameWorldsSection = ({ onStartClockKingdom }) => {
   const handleGameClick = (gameId) => {
     if (gameId === "clock-kingdom" && onStartClockKingdom) {
       onStartClockKingdom();
+    } else if (gameId === "math-rangers" && onStartMathsRangers) {
+      onStartMathsRangers();
     } else {
       setSelectedGame(selectedGame === gameId ? null : gameId);
     }

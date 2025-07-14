@@ -192,8 +192,8 @@ const RaceTrack = ({
 
   const getVehicleStyle = (vehicle) => {
     const leftPosition = 40 + vehicle.position;
-    // Player car always faces right, AI cars flip based on direction
-    let transform = "scaleX(-1)";
+    // Player car always faces right
+    let transform = "scaleX(1)";
     if (vehicle.id !== "player") {
       if (vehicle.direction === "right") {
         transform = "scaleX(-1)";

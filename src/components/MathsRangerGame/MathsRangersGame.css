@@ -178,6 +178,46 @@
   }
 }
 
+.maths-rangers-game .exit-game-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  z-index: 10001;
+}
+
+.maths-rangers-game .exit-game-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.5);
+}
+
+@media (max-width: 768px) {
+  .maths-rangers-game .exit-game-btn {
+    bottom: 15px;
+    right: 15px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .maths-rangers-game .exit-game-btn {
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
+}
+
 @media (max-width: 600px) {
   .game-header {
     flex-direction: column;
@@ -197,5 +237,150 @@
   .game-stats {
     font-size: 0.95rem;
     justify-content: center;
+  }
+}
+
+.maths-rangers-game .hint-button {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  background: linear-gradient(135deg, #fffbe7 0%, #ffe066 100%);
+  border: 3px solid #ffd700;
+  border-radius: 25px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #8b4513;
+  cursor: pointer;
+  z-index: 10001;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  animation: clock-kingdom-button-pulse 2s ease-in-out infinite;
+}
+
+.maths-rangers-game .hint-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
+}
+
+.maths-rangers-game .game-hint {
+  position: fixed;
+  bottom: 140px;
+  left: 20px;
+  background: linear-gradient(135deg, #fffbe7 0%, #ffe066 100%);
+  border: 3px solid #ffd700;
+  border-radius: 20px;
+  padding: 15px 20px;
+  max-width: 300px;
+  z-index: 10001;
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+  animation: clock-kingdom-hint-glow 3s ease-in-out infinite alternate;
+  backdrop-filter: blur(10px);
+}
+
+.maths-rangers-game .hint-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  text-align: center;
+  animation: clock-kingdom-hint-pulse 2s ease-in-out infinite;
+}
+
+.maths-rangers-game .hint-text {
+  font-size: 0.95rem;
+  color: #8b4513;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@keyframes clock-kingdom-hint-glow {
+  0% {
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+  }
+  100% {
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+  }
+}
+
+@keyframes clock-kingdom-hint-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.maths-rangers-game .music-toggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: linear-gradient(135deg, #fffbe7 0%, #ffe066 100%);
+  border: 3px solid #ffd700;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10001;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.maths-rangers-game .music-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .maths-rangers-game .hint-button {
+    bottom: 70px;
+    left: 15px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+  .maths-rangers-game .game-hint {
+    bottom: 120px;
+    left: 15px;
+    padding: 12px 16px;
+    max-width: 250px;
+  }
+  .maths-rangers-game .hint-text {
+    font-size: 0.9rem;
+  }
+  .maths-rangers-game .music-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .maths-rangers-game .hint-button {
+    bottom: 60px;
+    left: 10px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  .maths-rangers-game .game-hint {
+    bottom: 100px;
+    left: 10px;
+    padding: 10px 12px;
+    max-width: 200px;
+  }
+  .maths-rangers-game .hint-text {
+    font-size: 0.85rem;
+  }
+  .maths-rangers-game .hint-icon {
+    font-size: 1.3rem;
+  }
+  .maths-rangers-game .music-toggle {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 }
