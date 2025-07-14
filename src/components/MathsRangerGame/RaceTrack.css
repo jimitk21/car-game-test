@@ -206,14 +206,15 @@
 
 @keyframes nitroBoost {
   0% {
-    transform: scale(1);
+    transform: scaleX(var(--direction, 1)) scale(var(--boostScale, 1));
     box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
   }
   100% {
-    transform: scale(1.1);
+    transform: scaleX(var(--direction, 1)) scale(var(--boostScale, 1.1));
     box-shadow: 0 0 30px rgba(255, 107, 53, 1);
   }
 }
+
 
 @keyframes slowDown {
   0% {
@@ -307,18 +308,20 @@
   z-index: 2000;
   background: rgba(30, 30, 60, 0.98);
   color: #fff;
-  border-radius: 24px 24px 32px 32px;
-  padding: 24px 56px 32px 56px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 8px 24px 0 #00eaff44;
+  border-radius: 12px 12px 18px 18px;
+  padding: 8px 20px 12px 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 4px 12px #00eaff44;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 2.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
   animation: nitro-pop 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   pointer-events: none;
   margin-top: 0;
 }
+
+
 
 .nitro-card-float::before {
   content: "";
@@ -337,7 +340,7 @@
 .nitro-title {
   font-size: 2.5rem;
   letter-spacing: 2px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   text-shadow: 0 2px 8px #00eaff, 0 0 2px #fff;
 }
 
