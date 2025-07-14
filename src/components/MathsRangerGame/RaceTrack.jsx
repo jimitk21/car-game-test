@@ -1,16 +1,22 @@
 import "./RaceTrack.css";
 
 const RaceTrack = ({ playerPosition, aiCarsPositions, playerSpeed }) => {
-  const getCarStyle = (position) => {
+  const getCarStyle = (position, carIndex = 0) => {
     // Calculate position along the rectangular track
-    const trackLength = 100;
+    const trackLength = 1800;
     // Reverse the direction by inverting the normalized position
     const normalizedPos = 1 - (position % trackLength) / trackLength;
 
-    // Track dimensions
-    const trackWidth = 300;
-    const trackHeight = 150;
-    const cornerRadius = 40;
+    // Track dimensions - increased for bigger track
+    const trackWidth = 480; // Increased from 300
+    const trackHeight = 280; // Increased from 150
+    const cornerRadius = 60; // Increased from 40
+
+    // Lane separation - creates multiple lanes for cars
+    const laneWidth = 25; // Width of each lane
+    const totalLanes = 4; // Total number of lanes
+    const baseLaneOffset = -37.5; // Center offset for lanes
+    const laneOffset = baseLaneOffset + carIndex * laneWidth;
 
     let x,
       y,
@@ -20,28 +26,30 @@ const RaceTrack = ({ playerPosition, aiCarsPositions, playerSpeed }) => {
       // Top straight
       const progress = normalizedPos / 0.25;
       x = progress * (trackWidth - 2 * cornerRadius) + cornerRadius;
-      y = cornerRadius;
+      y = cornerRadius + laneOffset;
       rotation = 0;
     } else if (normalizedPos <= 0.5) {
       // Right curve
       const progress = (normalizedPos - 0.25) / 0.25;
       const angle = (progress * Math.PI) / 2;
-      x = trackWidth - cornerRadius + cornerRadius * Math.cos(angle);
-      y = cornerRadius + cornerRadius * Math.sin(angle);
+      const radius = cornerRadius + laneOffset;
+      x = trackWidth - cornerRadius + radius * Math.cos(angle);
+      y = cornerRadius + radius * Math.sin(angle);
       rotation = progress * 90;
     } else if (normalizedPos <= 0.75) {
       // Bottom straight
       const progress = (normalizedPos - 0.5) / 0.25;
       x =
         trackWidth - cornerRadius - progress * (trackWidth - 2 * cornerRadius);
-      y = trackHeight - cornerRadius;
+      y = trackHeight - cornerRadius - laneOffset;
       rotation = 180;
     } else {
       // Left curve
       const progress = (normalizedPos - 0.75) / 0.25;
       const angle = (progress * Math.PI) / 2;
-      x = cornerRadius - cornerRadius * Math.cos(angle);
-      y = trackHeight - cornerRadius - cornerRadius * Math.sin(angle);
+      const radius = cornerRadius + laneOffset;
+      x = cornerRadius - radius * Math.cos(angle);
+      y = trackHeight - cornerRadius - radius * Math.sin(angle);
       rotation = 180 + progress * 90;
     }
 
@@ -60,8 +68,7 @@ const RaceTrack = ({ playerPosition, aiCarsPositions, playerSpeed }) => {
         <div className="track-border">
           <div className="track-inner">
             <div className="finish-line">🏁</div>
-
-            {/* Player Car */}
+            {/* Player Car - Lane 0 */}
             <div
               className={`car player-car ${
                 playerSpeed > 2
@@ -70,17 +77,16 @@ const RaceTrack = ({ playerPosition, aiCarsPositions, playerSpeed }) => {
                   ? "slowed"
                   : ""
               }`}
-              style={getCarStyle(playerPosition)}
+              style={getCarStyle(playerPosition, 0)}
             >
               🏎️
             </div>
-
-            {/* AI Cars */}
+            {/* AI Cars - Different lanes */}
             {aiCarsPositions.map((position, index) => (
               <div
                 key={index}
                 className={`car ai-car ai-car-${index}`}
-                style={getCarStyle(position)}
+                style={getCarStyle(position, index + 1)}
               >
                 🚗
               </div>

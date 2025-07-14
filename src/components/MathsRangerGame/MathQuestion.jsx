@@ -21,56 +21,37 @@ const MathQuestion = ({ question, onAnswer }) => {
   if (!question) return null;
 
   return (
-    <div className="math-question-container">
-      <div className="question-card">
-        <div className="question-header">
-          <h3>🧮 Solve to Boost Your Car! 🚀</h3>
-        </div>
-
-        <div className="question-content">
-          <div className="question-text">{question.question} = ?</div>
-
-          <div className="answer-options">
-            {question.options.map((option, index) => (
-              <button
-                key={index}
-                className={`answer-option ${
-                  selectedAnswer === option
-                    ? option === question.answer
-                      ? "correct"
-                      : "incorrect"
-                    : ""
-                } ${
-                  showFeedback && option === question.answer
-                    ? "highlight-correct"
-                    : ""
-                }`}
-                onClick={() => handleAnswerClick(option)}
-                disabled={showFeedback}
-              >
-                {option}
-              </button>
-            ))}
+    <div className="math-question-sticky-wrapper">
+      <div className="math-question-container">
+        <div className="question-card">
+          <div className="question-header">
+            <h3>🧮 Solve to Boost Your Car! 🚀</h3>
           </div>
-
-          {showFeedback && (
-            <div
-              className={`feedback ${
-                selectedAnswer === question.answer
-                  ? "correct-feedback"
-                  : "incorrect-feedback"
-              }`}
-            >
-              {selectedAnswer === question.answer ? (
-                <span>🎉 Correct! Nitro Boost Activated! 🚀</span>
-              ) : (
-                <span>
-                  ❌ Oops! Your car is slowing down... The answer was{" "}
-                  {question.answer}
-                </span>
-              )}
+          <div className="question-content">
+            <div className="question-text">{question.question} = ?</div>
+            <div className="answer-options">
+              {question.options.map((option, index) => (
+                <button
+                  key={index}
+                  className={`answer-option ${
+                    selectedAnswer === option
+                      ? option === question.answer
+                        ? "correct"
+                        : "incorrect"
+                      : ""
+                  } ${
+                    showFeedback && option === question.answer
+                      ? "highlight-correct"
+                      : ""
+                  }`}
+                  onClick={() => handleAnswerClick(option)}
+                  disabled={showFeedback}
+                >
+                  {option}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

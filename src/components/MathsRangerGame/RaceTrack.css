@@ -7,8 +7,8 @@
 
 .race-track {
   position: relative;
-  width: 400px;
-  height: 250px;
+  width: 600px; /* Increased from 400px */
+  height: 400px; /* Increased from 250px */
   margin-bottom: 20px;
 }
 
@@ -16,8 +16,8 @@
   width: 100%;
   height: 100%;
   background: #8b4513;
-  border-radius: 50px;
-  padding: 20px;
+  border-radius: 80px; /* Increased from 50px */
+  padding: 30px; /* Increased from 20px */
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   position: relative;
 }
@@ -26,7 +26,7 @@
   width: 100%;
   height: 100%;
   background: #228b22;
-  border-radius: 30px;
+  border-radius: 50px; /* Increased from 30px */
   position: relative;
   overflow: hidden;
 }
@@ -37,26 +37,26 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: calc(100% - 40px);
-  height: calc(100% - 40px);
-  border: 3px dashed #ffff00;
-  border-radius: 20px;
+  width: calc(100% - 60px); /* Increased from 40px */
+  height: calc(100% - 60px); /* Increased from 40px */
+  border: 4px dashed #ffff00; /* Increased from 3px */
+  border-radius: 30px; /* Increased from 20px */
   z-index: 1;
 }
 
 .finish-line {
   position: absolute;
-  top: 20px;
+  top: 30px; /* Increased from 20px */
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2rem;
+  font-size: 2.5rem; /* Increased from 2rem */
   z-index: 2;
   animation: wave 2s ease-in-out infinite;
 }
 
 .car {
   position: absolute;
-  font-size: 2rem;
+  font-size: 2.5rem; /* Increased from 2rem */
   z-index: 3;
   transition: all 0.1s ease;
   transform-origin: center;
@@ -90,7 +90,7 @@
 
 .progress-indicators {
   width: 100%;
-  max-width: 400px;
+  max-width: 600px; /* Increased from 400px */
   background: rgba(255, 255, 255, 0.9);
   padding: 15px;
   border-radius: 15px;
@@ -152,15 +152,13 @@
 
 @media (max-width: 768px) {
   .race-track {
-    width: 300px;
-    height: 200px;
+    width: 400px; /* Increased from 300px */
+    height: 300px; /* Increased from 200px */
   }
-
   .car {
-    font-size: 1.5rem;
+    font-size: 2rem; /* Increased from 1.5rem */
   }
-
   .finish-line {
-    font-size: 1.5rem;
+    font-size: 2rem; /* Increased from 1.5rem */
   }
 }

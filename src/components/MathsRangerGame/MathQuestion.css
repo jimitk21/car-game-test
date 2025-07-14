@@ -1,17 +1,35 @@
+/* Sticky wrapper for the question card at the bottom */
+.math-question-sticky-wrapper {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
 .math-question-container {
   display: flex;
   justify-content: center;
+  align-items: flex-end;
   margin-top: 20px;
+  pointer-events: auto;
 }
 
 .question-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  max-width: 500px;
-  width: 100%;
-  animation: slideUp 0.5s ease-out;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 20px 20px 0 0;
+  padding: 10px;
+  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 88vw;
+  animation: slideUp 0.3s ease-out;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .question-header {
@@ -25,26 +43,42 @@
   margin: 0;
 }
 
+/* Side-by-side layout for question and options */
 .question-content {
-  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 32px;
 }
 
 .question-text {
   font-size: 2rem;
   font-weight: bold;
   color: #333;
-  margin-bottom: 25px;
+  margin-bottom: 0;
   padding: 15px;
   background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
   border-radius: 15px;
   border: 3px solid #2196f3;
+  min-width: 120px;
+  text-align: center;
 }
 
 .answer-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: row;
   gap: 15px;
-  margin-bottom: 20px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.answer-option {
+  flex: 1 1 0;
+  min-width: 70px;
+  max-width: 120px;
+  text-align: center;
 }
 
 .answer-option {
@@ -174,19 +208,23 @@
 
 @media (max-width: 768px) {
   .question-card {
-    margin: 0 10px;
-    padding: 20px;
+    max-width: 100vw;
+    width: 100vw;
+    border-radius: 15px 15px 0 0;
+    padding: 12px 6px 12px 6px;
   }
-
-  .question-text {
-    font-size: 1.5rem;
-  }
-
-  .answer-options {
-    grid-template-columns: 1fr;
+  .question-content {
+    flex-direction: column;
     gap: 10px;
   }
-
+  .answer-options {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .question-text {
+    font-size: 1.2rem;
+    min-width: 0;
+  }
   .answer-option {
     padding: 12px 15px;
     font-size: 1.1rem;

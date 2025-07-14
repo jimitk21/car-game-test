@@ -14,41 +14,37 @@ const MathsRangersGame = () => {
   const [playerSpeed, setPlayerSpeed] = useState(1);
   const [gameTime, setGameTime] = useState(0);
   const [winner, setWinner] = useState(null);
+  const [feedback, setFeedback] = useState("");
   const gameLoopRef = useRef();
 
   // Generate random math questions
   const generateQuestion = () => {
-    const operations = ["+", "-", "×", "÷"];
+    // Addition, subtraction, and multiplication, numbers 2-10
+    const operations = ["+", "-", "×"];
     const operation = operations[Math.floor(Math.random() * operations.length)];
     let num1, num2, answer;
 
     switch (operation) {
       case "+":
-        num1 = Math.floor(Math.random() * 50) + 1;
-        num2 = Math.floor(Math.random() * 50) + 1;
+        num1 = Math.floor(Math.random() * 9) + 2; // 2-10
+        num2 = Math.floor(Math.random() * 9) + 2; // 2-10
         answer = num1 + num2;
         break;
       case "-":
-        num1 = Math.floor(Math.random() * 50) + 20;
-        num2 = Math.floor(Math.random() * num1);
+        num1 = Math.floor(Math.random() * 9) + 2; // 2-10
+        num2 = Math.floor(Math.random() * (num1 - 1)) + 2; // 2 to num1
         answer = num1 - num2;
         break;
       case "×":
-        num1 = Math.floor(Math.random() * 12) + 1;
-        num2 = Math.floor(Math.random() * 12) + 1;
+        num1 = Math.floor(Math.random() * 9) + 2; // 2-10
+        num2 = Math.floor(Math.random() * 9) + 2; // 2-10
         answer = num1 * num2;
         break;
-      case "÷":
-        answer = Math.floor(Math.random() * 12) + 1;
-        num2 = Math.floor(Math.random() * 12) + 1;
-        num1 = answer * num2;
-        break;
       default:
-        num1 = 5;
-        num2 = 3;
-        answer = 8;
+        num1 = 2;
+        num2 = 2;
+        answer = 4;
     }
-
     return {
       question: `${num1} ${operation} ${num2}`,
       answer: answer,
@@ -58,13 +54,14 @@ const MathsRangersGame = () => {
 
   const generateOptions = (correctAnswer) => {
     const options = [correctAnswer];
-    while (options.length < 4) {
+    while (options.length < 3) {
       const wrongAnswer = correctAnswer + Math.floor(Math.random() * 20) - 10;
       if (wrongAnswer > 0 && !options.includes(wrongAnswer)) {
         options.push(wrongAnswer);
       }
     }
-    return options.sort(() => Math.random() - 0.5);
+    // Shuffle and return only 3 options
+    return options.sort(() => Math.random() - 0.5).slice(0, 3);
   };
 
   const startGame = () => {
@@ -82,15 +79,18 @@ const MathsRangersGame = () => {
     if (selectedAnswer === currentQuestion.answer) {
       setScore((prev) => prev + 10);
       setPlayerSpeed(3); // Nitro boost
+      setFeedback("🎉 Correct! Nitro Boost Activated! 🚀");
       setTimeout(() => setPlayerSpeed(1.5), 2000); // Return to normal speed after 2 seconds
     } else {
       setPlayerSpeed(0.5); // Slow down
+      setFeedback(
+        `❌ Oops! Your car is slowing down... The answer was ${currentQuestion.answer}`
+      );
       setTimeout(() => setPlayerSpeed(1), 1500); // Return to normal speed after 1.5 seconds
     }
-
-    // Generate new question after a short delay
     setTimeout(() => {
       setCurrentQuestion(generateQuestion());
+      setFeedback("");
     }, 1000);
   };
 
@@ -103,10 +103,10 @@ const MathsRangersGame = () => {
         // Move player car
         setPlayerPosition((prev) => {
           const newPos = prev + playerSpeed;
-          if (newPos >= 100) {
+          if (newPos >= 1800) {
             setWinner("player");
             setGameState("finished");
-            return 100;
+            return 1800;
           }
           return newPos;
         });
@@ -116,10 +116,10 @@ const MathsRangersGame = () => {
           prev.map((pos, index) => {
             const speed = 0.8 + index * 0.2 + Math.random() * 0.3;
             const newPos = pos + speed;
-            if (newPos >= 100 && !winner) {
+            if (newPos >= 1800 && !winner) {
               setWinner(`ai-${index}`);
               setGameState("finished");
-              return 100;
+              return 1800;
             }
             return newPos;
           })
@@ -144,7 +144,8 @@ const MathsRangersGame = () => {
   return (
     <div className="maths-rangers-game">
       <div className="game-header">
-        <h1 className="game-title">🏎️ Math Rangers Racing 🏁</h1>
+        <div className="game-header-title">🏎️ Math Rangers Racing 🏁</div>
+        {feedback && <div className="game-feedback-top">{feedback}</div>}
         <div className="game-stats">
           <span className="score">Score: {score}</span>
           <span className="time">Time: {Math.floor(gameTime / 10)}s</span>
