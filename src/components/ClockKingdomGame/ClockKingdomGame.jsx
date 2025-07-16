@@ -5,6 +5,7 @@ import "./ClockKingdomGame.css";
 import GuessTheTime from "./GuessTheTime.jsx";
 import SetTheTime from "./SetTheTime.jsx";
 import AMPMAdventure from "./AMPMAdventure.jsx";
+import UserFormAndFeedback from "./UserFormAndFeedback.jsx";
 
 function shuffle(array) {
   const arr = array.slice();
@@ -243,24 +244,23 @@ const ClockKingdom = ({ onExitGame }) => {
   const [timeOfDay, setTimeOfDay] = useState("morning");
   const [showMonkey, setShowMonkey] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
+  const [wrongAnswers, setWrongAnswers] = useState([]);
 
-  // Shuffled questions and indices
   const [guessTimeQuestions, setGuessTimeQuestions] = useState([]);
   const [ampmQuestions, setAMPMQuestions] = useState([]);
   const [guessIndex, setGuessIndex] = useState(0);
   const [setClockIndex, setSetClockIndex] = useState(0);
   const [ampmIndex, setAMPMIndex] = useState(0);
 
-  // Set the Clock state
   const [targetTime, setTargetTime] = useState({ hours: 3, minutes: 15 });
   const [clockHours, setClockHours] = useState(12);
   const [clockMinutes, setClockMinutes] = useState(0);
 
-  const audioRef = useRef(null);
-  const [musicOn, setMusicOn] = useState(true);
   const musicRef = useRef(null);
   const tickRef = useRef(null);
   const prevScoreRef = useRef(score);
+  const [musicOn, setMusicOn] = useState(true);
 
   useEffect(() => {
     if (score < 3) setTimeOfDay("morning");
@@ -269,12 +269,10 @@ const ClockKingdom = ({ onExitGame }) => {
   }, [score]);
 
   useEffect(() => {
-    // Shuffle questions at the start
     setGuessTimeQuestions(shuffle(guessTimeQuestionsOrig));
     setAMPMQuestions(shuffle(ampmQuestionsOrig));
   }, []);
 
-  // Get current game name based on game state
   const getCurrentGameName = () => {
     switch (gameState) {
       case "guessTime":
@@ -290,7 +288,6 @@ const ClockKingdom = ({ onExitGame }) => {
     }
   };
 
-  // Get current game hint based on game state
   const getCurrentGameHint = () => {
     switch (gameState) {
       case "guessTime":
@@ -304,18 +301,16 @@ const ClockKingdom = ({ onExitGame }) => {
     }
   };
 
-  // Toggle hint visibility
   const toggleHint = () => {
     setShowHint(!showHint);
   };
 
-  // Reset hint when game state changes
   useEffect(() => {
     setShowHint(false);
   }, [gameState]);
 
-  // Start the game
-  const startGame = () => {
+  const startGame = (userInfo) => {
+    setUserDetails(userInfo);
     setGameState("guessTime");
     setGuessIndex(0);
     setSetClockIndex(0);
@@ -323,9 +318,20 @@ const ClockKingdom = ({ onExitGame }) => {
     setScore(0);
     setProgress(0);
     setBadges([]);
+    setWrongAnswers([]);
+    setShowFeedback("");
+    setTargetTime(generateNewTargetTime());
+    setClockHours(12);
+    setClockMinutes(0);
   };
 
-  // Guess the Time logic
+  const generateNewTargetTime = () => {
+    return {
+      hours: Math.floor(Math.random() * 12) + 1,
+      minutes: Math.floor(Math.random() * 12) * 5,
+    };
+  };
+
   const handleGuessAnswer = (selectedIndex) => {
     const current = guessTimeQuestions[guessIndex];
     if (selectedIndex === current.correct) {
@@ -343,18 +349,20 @@ const ClockKingdom = ({ onExitGame }) => {
         }
       }, 1200);
     } else {
+      setWrongAnswers((prev) => [
+        ...prev,
+        {
+          game: "Guess the Time",
+          question: `${current.time.hours}:${String(
+            current.time.minutes
+          ).padStart(2, "0")}`,
+          selectedAnswer: current.options[selectedIndex],
+          correctAnswer: current.options[current.correct],
+        },
+      ]);
       setShowFeedback("incorrect");
       setTimeout(() => setShowFeedback(""), 1200);
     }
-  };
-
-  // Set the Clock logic
-  const generateNewTargetTime = () => {
-    // Generate a random time for each set clock question
-    return {
-      hours: Math.floor(Math.random() * 12) + 1,
-      minutes: Math.floor(Math.random() * 12) * 5,
-    };
   };
 
   useEffect(() => {
@@ -386,12 +394,26 @@ const ClockKingdom = ({ onExitGame }) => {
         }
       }, 1200);
     } else {
+      setWrongAnswers((prev) => [
+        ...prev,
+        {
+          game: "Set the Clock",
+          question: `${String(targetTime.hours).padStart(2, "0")}:${String(
+            targetTime.minutes
+          ).padStart(2, "0")}`,
+          selectedAnswer: `${String(clockHours).padStart(2, "0")}:${String(
+            clockMinutes
+          ).padStart(2, "0")}`,
+          correctAnswer: `${String(targetTime.hours).padStart(2, "0")}:${String(
+            targetTime.minutes
+          ).padStart(2, "0")}`,
+        },
+      ]);
       setShowFeedback("incorrect");
       setTimeout(() => setShowFeedback(""), 1200);
     }
   };
 
-  // AM/PM logic
   const handleAMPMAnswer = (answer) => {
     const current = ampmQuestions[ampmIndex];
     if (answer === current.correct) {
@@ -408,183 +430,20 @@ const ClockKingdom = ({ onExitGame }) => {
         }
       }, 1200);
     } else {
+      setWrongAnswers((prev) => [
+        ...prev,
+        {
+          game: "AM/PM Adventure",
+          question: current.question,
+          selectedAnswer: answer,
+          correctAnswer: current.correct,
+        },
+      ]);
       setShowFeedback("incorrect");
       setTimeout(() => setShowFeedback(""), 1200);
     }
   };
 
-  const AnalogClock = ({ hours, minutes, interactive = false, size = 180 }) => {
-    const hourAngle = (hours % 12) * 30 + minutes * 0.5;
-    const minuteAngle = minutes * 6;
-    const numberRadius = size * 0.33; // 60 for 180px
-    const hourHandLength = size * 0.22; // 40 for 180px
-    const minuteHandLength = size * 0.33; // 60 for 180px
-    const hourHandTop = size * 0.33; // 60 for 180px
-    const minuteHandTop = size * 0.17; // 30 for 180px
-
-    return (
-      <div className="analog-clock" style={{ width: size, height: size }}>
-        <div className="clock-face">
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className="hour-mark"
-              style={{ transform: `rotate(${i * 30}deg)` }}
-            />
-          ))}
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={`number-${i}`}
-              className="hour-number"
-              style={{
-                transform: `rotate(${
-                  i * 30
-                }deg) translateY(-${numberRadius}px) rotate(-${i * 30}deg)`,
-              }}
-            >
-              {i === 0 ? 12 : i}
-            </div>
-          ))}
-          <div
-            className="clock-hand hour-hand-guess-time"
-            style={{
-              transform: `rotate(${hourAngle}deg)`,
-              height: `${hourHandLength}px`,
-              top: `${hourHandTop}px`,
-            }}
-          />
-          <div
-            className="clock-hand minute-hand"
-            style={{
-              transform: `rotate(${minuteAngle}deg)`,
-              height: `${minuteHandLength}px`,
-              top: `${minuteHandTop}px`,
-            }}
-          />
-          <div className="clock-center" />
-        </div>
-      </div>
-    );
-  };
-
-  const InteractiveAnalogClock = () => {
-    const handleHourUp = () => {
-      setClockHours((prev) => (prev === 12 ? 1 : prev + 1));
-    };
-
-    const handleHourDown = () => {
-      setClockHours((prev) => (prev === 1 ? 12 : prev - 1));
-    };
-
-    const handleMinuteUp = () => {
-      setClockMinutes((prev) => (prev + 5) % 60);
-    };
-
-    const handleMinuteDown = () => {
-      setClockMinutes((prev) => (prev === 0 ? 55 : prev - 5));
-    };
-
-    return (
-      <div className="interactive-clock-container">
-        <div className="target-time">
-          Set the clock to:{" "}
-          <span className="time-display">
-            {String(targetTime.hours).padStart(2, "0")}:
-            {String(targetTime.minutes).padStart(2, "0")}
-          </span>
-        </div>
-
-        <div className="clock-game-layout">
-          <div className="clock-section">
-            <div className="analog-clock">
-              <div className="clock-face">
-                {[...Array(12)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="hour-mark"
-                    style={{ transform: `rotate(${i * 30}deg)` }}
-                  />
-                ))}
-                {[...Array(12)].map((_, i) => (
-                  <div
-                    key={`number-${i}`}
-                    className="hour-number"
-                    style={{
-                      transform: `rotate(${
-                        i * 30
-                      }deg) translateY(-60px) rotate(-${i * 30}deg)`,
-                    }}
-                  >
-                    {i === 0 ? 12 : i}
-                  </div>
-                ))}
-                <div
-                  className="clock-hand hour-hand-set-clock"
-                  style={{
-                    transform: `rotate(${
-                      (clockHours % 12) * 30 + clockMinutes * 0.5
-                    }deg)`,
-                  }}
-                />
-                <div
-                  className="clock-hand minute-hand"
-                  style={{ transform: `rotate(${clockMinutes * 6}deg)` }}
-                />
-                <div className="clock-center" />
-              </div>
-            </div>
-          </div>
-
-          <div className="controls-section">
-            <div className="clock-controls">
-              <div className="current-time-display">
-                Current: {String(clockHours).padStart(2, "0")}:
-                {String(clockMinutes).padStart(2, "0")}
-              </div>
-
-              <div className="control-buttons">
-                <div className="hour-controls">
-                  <button
-                    className="control-btn hour-btn"
-                    onClick={handleHourUp}
-                  >
-                    ⬆️ Hour +1
-                  </button>
-                  <button
-                    className="control-btn hour-btn"
-                    onClick={handleHourDown}
-                  >
-                    ⬇️ Hour -1
-                  </button>
-                </div>
-
-                <div className="minute-controls">
-                  <button
-                    className="control-btn minute-btn"
-                    onClick={handleMinuteUp}
-                  >
-                    ⬆️ Minute +5
-                  </button>
-                  <button
-                    className="control-btn minute-btn"
-                    onClick={handleMinuteDown}
-                  >
-                    ⬇️ Minute -5
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <button className="check-answer-btn" onClick={checkClockAnswer}>
-          ✨ Check My Answer ✨
-        </button>
-      </div>
-    );
-  };
-
-  // Play/pause background music when toggled
   useEffect(() => {
     if (musicRef.current) {
       if (musicOn) {
@@ -596,7 +455,6 @@ const ClockKingdom = ({ onExitGame }) => {
     }
   }, [musicOn]);
 
-  // Play/pause music on mount/unmount
   useEffect(() => {
     if (musicRef.current && musicOn) {
       musicRef.current.play();
@@ -609,7 +467,6 @@ const ClockKingdom = ({ onExitGame }) => {
     };
   }, []);
 
-  // Play tick sound when score increases
   useEffect(() => {
     if (score > prevScoreRef.current && tickRef.current) {
       tickRef.current.currentTime = 0;
@@ -620,7 +477,6 @@ const ClockKingdom = ({ onExitGame }) => {
 
   return (
     <div className={`clock-kingdom ${timeOfDay}`}>
-      {/* Animated Background Elements */}
       <div className="background-elements">
         <div className="floating-clouds">
           <div className="cloud cloud-1">☁️</div>
@@ -641,7 +497,6 @@ const ClockKingdom = ({ onExitGame }) => {
         </div>
       </div>
 
-      {/* Progress Bar */}
       <div className="progress-container" style={{ position: "relative" }}>
         <div className="progress-bar">
           <div
@@ -649,7 +504,6 @@ const ClockKingdom = ({ onExitGame }) => {
             style={{ width: `${progress}%` }}
           ></div>
         </div>
-        {/* Monkey Animation */}
         {showMonkey && <div className="monkey-fall-animation">🐒</div>}
         <div className="badges">
           {badges.map((badge, index) => (
@@ -660,35 +514,24 @@ const ClockKingdom = ({ onExitGame }) => {
         </div>
       </div>
 
-      {/* Gem Score Card */}
       <div className="gem-score-card">
         <div className="gem-icon">💎</div>
         <div className="gem-score">{score}</div>
       </div>
 
-      {/* Main Game Container */}
       <div className="game-container">
         <div className="floating-island">
-          {/* Game Name Display */}
-          {gameState !== "welcome" && (
+          {gameState !== "welcome" && gameState !== "completed" && (
             <div className="game-name-display">{getCurrentGameName()}</div>
           )}
           <div className="game-card">
-            {gameState === "welcome" && (
-              <div className="welcome-screen">
-                <div className="owl-guardian">🦉</div>
-                <div className="welcome-scroll">
-                  <h1 className="game-title">Clock Kingdom</h1>
-                  <h2 className="subtitle">Time-Telling Adventures</h2>
-                  <div className="owl-message">
-                    "Welcome to Clock Kingdom! Let's master the magic of time!"
-                  </div>
-                  <button className="start-adventure-btn" onClick={startGame}>
-                    ✨ Start Adventure ✨
-                  </button>
-                </div>
-              </div>
-            )}
+            <UserFormAndFeedback
+              onStartGame={startGame}
+              gameState={gameState}
+              score={score}
+              badges={badges}
+              wrongAnswers={wrongAnswers}
+            />
             {gameState === "guessTime" && guessTimeQuestions.length > 0 && (
               <GuessTheTime
                 currentQuestion={guessTimeQuestions[guessIndex]}
@@ -725,7 +568,10 @@ const ClockKingdom = ({ onExitGame }) => {
                   <span className="confetti">🎈</span>
                 </div>
                 <div className="completed-buttons">
-                  <button className="start-adventure-btn" onClick={startGame}>
+                  <button
+                    className="start-adventure-btn"
+                    onClick={() => startGame(userDetails)}
+                  >
                     Play Again
                   </button>
                   <button className="landing-btn" onClick={onExitGame}>
@@ -760,7 +606,6 @@ const ClockKingdom = ({ onExitGame }) => {
         </div>
       </div>
 
-      {/* Add audio elements and music toggle button at the root level */}
       <audio
         ref={musicRef}
         src="/src/assets/clockkingdom.mp3"
@@ -768,7 +613,7 @@ const ClockKingdom = ({ onExitGame }) => {
         preload="auto"
       />
       <audio ref={tickRef} src="/src/assets/clocktick.mp3" preload="auto" />
-      {/* Hint Button and Hint Display */}
+
       {gameState !== "welcome" && gameState !== "completed" && (
         <>
           <button className="hint-button" onClick={toggleHint}>
@@ -791,7 +636,6 @@ const ClockKingdom = ({ onExitGame }) => {
         {musicOn ? "🎵" : "🔇"}
       </div>
 
-      {/* Exit Game Button */}
       <button className="exit-game-btn" onClick={onExitGame}>
         Exit Game
       </button>

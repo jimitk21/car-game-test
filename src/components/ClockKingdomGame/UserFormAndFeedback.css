@@ -1,0 +1,154 @@
+.user-form-container,
+.feedback-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 20px;
+}
+
+.user-form-content,
+.feedback-content {
+  background: linear-gradient(135deg, #fffbe7 0%, #ffe066 100%);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+  border: 3px solid #ffd700;
+  max-width: 500px;
+  width: 100%;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+.user-form-content h2,
+.feedback-content h2 {
+  font-size: 2rem;
+  color: #8b4513;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 1.1rem;
+  color: #8b4513;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+.form-error {
+  color: #f44336;
+  font-size: 1rem;
+  margin-bottom: 15px;
+}
+
+.submit-button,
+.download-pdf-button {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border: none;
+  border-radius: 25px;
+  padding: 15px 30px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #8b4513;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  animation: clock-kingdom-button-pulse 2s ease-in-out infinite;
+}
+
+.submit-button:hover,
+.download-pdf-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
+}
+
+.feedback-content .user-details,
+.feedback-content .game-results,
+.feedback-content .wrong-answers {
+  margin: 20px 0;
+  text-align: left;
+}
+
+.feedback-content h3 {
+  font-size: 1.5rem;
+  color: #8b4513;
+  margin-bottom: 10px;
+}
+
+.feedback-content p,
+.feedback-content ul li {
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+.feedback-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.feedback-content ul li {
+  margin-bottom: 10px;
+}
+
+@keyframes clock-kingdom-button-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@media (max-width: 480px) {
+  .user-form-content,
+  .feedback-content {
+    padding: 20px;
+  }
+
+  .user-form-content h2,
+  .feedback-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .form-group label {
+    font-size: 1rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 0.9rem;
+  }
+
+  .submit-button,
+  .download-pdf-button {
+    padding: 12px 20px;
+    font-size: 1.1rem;
+  }
+
+  .feedback-content h3 {
+    font-size: 1.3rem;
+  }
+
+  .feedback-content p,
+  .feedback-content ul li {
+    font-size: 1rem;
+  }
+}
