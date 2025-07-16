@@ -8,6 +8,7 @@ const RaceTrack = ({
   aiVehicles,
   playerSpeed,
   nitroActive,
+  gameState, // Accept gameState prop
 }) => {
   const [trackWidth, setTrackWidth] = useState(800);
   const [vehicles, setVehicles] = useState([]);
@@ -146,6 +147,7 @@ const RaceTrack = ({
 
   // Update vehicle positions
   useEffect(() => {
+    if (gameState === "finished") return; // Stop updating if game is finished
     const updatePositions = () => {
       setVehicles((prev) =>
         prev.map((vehicle) => {
@@ -180,7 +182,7 @@ const RaceTrack = ({
 
     const interval = setInterval(updatePositions, 50);
     return () => clearInterval(interval);
-  }, [RACE_DISTANCE]);
+  }, [RACE_DISTANCE, gameState]);
 
   // Check for race completion
   useEffect(() => {

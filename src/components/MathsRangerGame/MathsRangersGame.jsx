@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import RaceTrack from "./RaceTrack";
 import MathQuestion from "./MathQuestion";
+import UserFormAndFeedback from "./UserFormAndFeedback";
 import "./MathsRangersGame.css";
+import { useNavigate } from "react-router-dom";
 
 const BASE_PLAYER_SPEED = 1.2;
 const NITRO_SPEED = 3.2;
@@ -12,11 +14,12 @@ const SLOW_SPEED = 0.5;
 const SLOW_DURATION = 1500;
 
 const MathsRangersGame = ({ onExitGame }) => {
+  const navigate = useNavigate();
   const [musicOn, setMusicOn] = useState(true);
   const [showHint, setShowHint] = useState(false);
   const musicRef = useRef(null);
   const nitroRef = useRef(null);
-  const [gameState, setGameState] = useState("ready"); // ready, playing, finished
+  const [gameState, setGameState] = useState("ready");
   const [playerPosition, setPlayerPosition] = useState(0);
   const [aiVehicles, setAiVehicles] = useState([
     { type: "car", position: 0, speed: 1 },
@@ -28,35 +31,35 @@ const MathsRangersGame = ({ onExitGame }) => {
   const [playerSpeed, setPlayerSpeed] = useState(BASE_PLAYER_SPEED);
   const [nitroActive, setNitroActive] = useState(false);
   const [nitroQueue, setNitroQueue] = useState(0);
-  const [gameTime, setGameTime] = useState(0); // elapsed time in tenths of a second
+  const [gameTime, setGameTime] = useState(0);
   const [winner, setWinner] = useState(null);
   const [feedback, setFeedback] = useState("");
-  const [timeLimit, setTimeLimit] = useState(2400); // in tenths of a second (default 4 min)
+  const [timeLimit, setTimeLimit] = useState(2400);
+  const [userDetails, setUserDetails] = useState(null);
+  const [wrongAnswers, setWrongAnswers] = useState([]);
   const gameLoopRef = useRef();
   const nitroTimeoutRef = useRef();
   const speedTimeoutRef = useRef();
 
-  // Generate random math questions
   const generateQuestion = () => {
-    // Addition, subtraction, and multiplication, numbers 2-10
     const operations = ["+", "-", "×"];
     const operation = operations[Math.floor(Math.random() * operations.length)];
     let num1, num2, answer;
 
     switch (operation) {
       case "+":
-        num1 = Math.floor(Math.random() * 9) + 2; // 2-10
-        num2 = Math.floor(Math.random() * 9) + 2; // 2-10
+        num1 = Math.floor(Math.random() * 9) + 2;
+        num2 = Math.floor(Math.random() * 9) + 2;
         answer = num1 + num2;
         break;
       case "-":
-        num1 = Math.floor(Math.random() * 9) + 2; // 2-10
-        num2 = Math.floor(Math.random() * (num1 - 1)) + 2; // 2 to num1
+        num1 = Math.floor(Math.random() * 9) + 2;
+        num2 = Math.floor(Math.random() * (num1 - 1)) + 2;
         answer = num1 - num2;
         break;
       case "×":
-        num1 = Math.floor(Math.random() * 9) + 2; // 2-10
-        num2 = Math.floor(Math.random() * 9) + 2; // 2-10
+        num1 = Math.floor(Math.random() * 9) + 2;
+        num2 = Math.floor(Math.random() * 9) + 2;
         answer = num1 * num2;
         break;
       default:
@@ -79,11 +82,9 @@ const MathsRangersGame = ({ onExitGame }) => {
         options.push(wrongAnswer);
       }
     }
-    // Shuffle and return only 3 options
     return options.sort(() => Math.random() - 0.5).slice(0, 3);
   };
 
-  // Clear all timeouts helper function
   const clearAllTimeouts = () => {
     if (nitroTimeoutRef.current) {
       clearTimeout(nitroTimeoutRef.current);
@@ -95,9 +96,7 @@ const MathsRangersGame = ({ onExitGame }) => {
     }
   };
 
-  // Activate nitro boost
   const activateNitro = () => {
-    // Clear any existing slow speed timeout when nitro activates
     if (speedTimeoutRef.current) {
       clearTimeout(speedTimeoutRef.current);
       speedTimeoutRef.current = null;
@@ -106,12 +105,10 @@ const MathsRangersGame = ({ onExitGame }) => {
     setPlayerSpeed(NITRO_SPEED);
     setNitroActive(true);
 
-    // Clear any existing nitro timeout
     if (nitroTimeoutRef.current) {
       clearTimeout(nitroTimeoutRef.current);
     }
 
-    // Set new timeout for nitro
     nitroTimeoutRef.current = setTimeout(() => {
       setNitroActive(false);
       setPlayerSpeed(BASE_PLAYER_SPEED);
@@ -119,23 +116,19 @@ const MathsRangersGame = ({ onExitGame }) => {
     }, NITRO_DURATION);
   };
 
-  // Process nitro queue when nitro becomes inactive
   useEffect(() => {
     if (!nitroActive && nitroQueue > 0) {
-      // Use a shorter delay and process the queue immediately
       const timer = setTimeout(() => {
         setNitroQueue((prev) => prev - 1);
         activateNitro();
-      }, 100); // Reduced delay from 50ms to 100ms for better reliability
-
+      }, 100);
       return () => clearTimeout(timer);
     }
   }, [nitroActive, nitroQueue]);
 
-  // Play/pause background music when toggled
   useEffect(() => {
     if (musicRef.current) {
-      musicRef.current.volume = 0.2; // Set background music volume low
+      musicRef.current.volume = 0.2;
       if (musicOn) {
         musicRef.current.play();
       } else {
@@ -145,7 +138,6 @@ const MathsRangersGame = ({ onExitGame }) => {
     }
   }, [musicOn]);
 
-  // Play/pause music on mount/unmount
   useEffect(() => {
     if (musicRef.current) {
       musicRef.current.volume = 0.2;
@@ -161,21 +153,21 @@ const MathsRangersGame = ({ onExitGame }) => {
     };
   }, []);
 
-  // Context-sensitive hint text
   const getCurrentGameHint = () => {
     switch (gameState) {
       case "ready":
-        return "Press 'Start Racing!' to begin your math adventure!";
+        return "Enter your details to start your math adventure!";
       case "playing":
         return "Answer math questions correctly to boost your car and win the race! Use Nitro wisely!";
       case "finished":
-        return "Try again to improve your score or race faster!";
+        return "Check your feedback and try again to improve your score!";
       default:
         return "";
     }
   };
 
-  const startGame = () => {
+  const startGame = (userInfo) => {
+    setUserDetails(userInfo);
     setGameState("playing");
     setPlayerPosition(0);
     setAiVehicles([
@@ -192,13 +184,11 @@ const MathsRangersGame = ({ onExitGame }) => {
     setCurrentQuestion(generateQuestion());
     setTimeLimit(3000);
     setFeedback("");
-
-    // Clear all timeouts on new game
+    setWrongAnswers([]);
     clearAllTimeouts();
   };
 
   const handleAnswer = (selectedAnswer) => {
-    // Clear any existing speed timeout
     if (speedTimeoutRef.current) {
       clearTimeout(speedTimeoutRef.current);
       speedTimeoutRef.current = null;
@@ -206,79 +196,73 @@ const MathsRangersGame = ({ onExitGame }) => {
 
     if (selectedAnswer === currentQuestion.answer) {
       setScore((prev) => prev + 10);
-      // Play nitro/horn sound
       if (nitroRef.current) {
         nitroRef.current.currentTime = 0;
         nitroRef.current.play();
       }
       if (nitroActive) {
-        // Queue another nitro if one is already active
         setNitroQueue((prev) => prev + 1);
         setFeedback("🎉 Correct! Nitro Boost Queued! 🚀");
       } else {
-        // Activate nitro immediately
         setFeedback("🎉 Correct! Nitro Boost Activated! 🚀");
         activateNitro();
       }
     } else {
-      // Wrong answer - slow down (but only if nitro is not active)
+      setWrongAnswers((prev) => [
+        ...prev,
+        {
+          question: currentQuestion.question,
+          selectedAnswer,
+          correctAnswer: currentQuestion.answer,
+        },
+      ]);
       if (!nitroActive) {
         setPlayerSpeed(SLOW_SPEED);
         setFeedback(
           `❌ Oops! Your car is slowing down... The answer was ${currentQuestion.answer}`
         );
-
         speedTimeoutRef.current = setTimeout(() => {
-          // Only reset to base speed if no nitro is active
           if (!nitroActive) {
             setPlayerSpeed(BASE_PLAYER_SPEED);
           }
           speedTimeoutRef.current = null;
         }, SLOW_DURATION);
       } else {
-        // If nitro is active, just show the feedback without slowing down
         setFeedback(
           `❌ Wrong answer! The correct answer was ${currentQuestion.answer}`
         );
       }
     }
 
-    // Clear feedback and generate new question
     setTimeout(() => {
       setCurrentQuestion(generateQuestion());
       setFeedback("");
     }, 1000);
   };
 
-  // Game loop
   useEffect(() => {
     if (gameState === "playing") {
       gameLoopRef.current = setInterval(() => {
         setGameTime((prev) => {
           if (prev + 1 >= timeLimit) {
-            // Do not end the game on time anymore
             return timeLimit;
           }
           return prev + 1;
         });
 
-        // Move player car
         setPlayerPosition((prev) => prev + playerSpeed);
 
-        // Move AI cars
         setAiVehicles((prev) =>
           prev.map((vehicle, index) => {
             let base = 1 + index * 0.15;
-            let random = Math.random() * 0.5 - 0.2; // -0.2 to +0.3
+            let random = Math.random() * 0.5 - 0.2;
             let speed = base + random;
             if (Math.random() < 0.05) speed += 0.7;
             return { ...vehicle, position: vehicle.position + speed };
           })
         );
 
-        // Check for winner by progress bar (position >= 1800)
         setTimeout(() => {
-          // Get latest positions
           let playerPos, aiPositions;
           setPlayerPosition((p) => {
             playerPos = p;
@@ -289,7 +273,7 @@ const MathsRangersGame = ({ onExitGame }) => {
             return ai;
           });
 
-          // Check if any car finished
+          // End the game as soon as either the player or any AI fills their progress bar
           if (
             playerPos >= 1800 ||
             (aiPositions && aiPositions.some((pos) => pos >= 1800))
@@ -300,7 +284,7 @@ const MathsRangersGame = ({ onExitGame }) => {
               (!aiPositions || aiPositions.every((pos) => playerPos >= pos))
             ) {
               setWinner("player");
-            } else {
+            } else if (aiPositions && aiPositions.some((pos) => pos >= 1800)) {
               setWinner("ai");
             }
           }
@@ -315,7 +299,6 @@ const MathsRangersGame = ({ onExitGame }) => {
     };
   }, [gameState, playerSpeed, timeLimit]);
 
-  // Clean up all timeouts on unmount or game state change
   useEffect(() => {
     return () => {
       clearAllTimeouts();
@@ -325,17 +308,12 @@ const MathsRangersGame = ({ onExitGame }) => {
     };
   }, []);
 
-  // Reset game state
   const resetGame = () => {
     setGameState("ready");
-
-    // Clear all intervals and timeouts
     if (gameLoopRef.current) {
       clearInterval(gameLoopRef.current);
     }
     clearAllTimeouts();
-
-    // Reset all states
     setPlayerSpeed(BASE_PLAYER_SPEED);
     setNitroActive(false);
     setNitroQueue(0);
@@ -345,11 +323,10 @@ const MathsRangersGame = ({ onExitGame }) => {
     setWinner(null);
     setFeedback("");
     setCurrentQuestion(null);
+    setUserDetails(null);
+    setWrongAnswers([]);
   };
 
-  // Exit Game Button (always visible)
-  // Style: fixed at bottom right, similar to ClockKingdom
-  // Only render if onExitGame is provided
   const exitButton = onExitGame ? (
     <button
       className="exit-game-btn"
@@ -376,20 +353,14 @@ const MathsRangersGame = ({ onExitGame }) => {
         </div>
       </div>
 
-      {gameState === "ready" && (
-        <div className="game-start-screen">
-          <div className="start-content">
-            <h2>Ready to Race, Math Sheriff? 🤠</h2>
-            <p>
-              Answer math questions correctly to boost your car and win the
-              race!
-            </p>
-            <button className="start-button" onClick={startGame}>
-              🚗 Start Racing!
-            </button>
-          </div>
-        </div>
-      )}
+      <UserFormAndFeedback
+        onStartGame={startGame}
+        gameState={gameState}
+        winner={winner}
+        score={score}
+        gameTime={gameTime}
+        wrongAnswers={wrongAnswers}
+      />
 
       {gameState === "playing" && (
         <>
@@ -398,6 +369,7 @@ const MathsRangersGame = ({ onExitGame }) => {
             aiVehicles={aiVehicles}
             playerSpeed={playerSpeed}
             nitroActive={nitroActive}
+            gameState={gameState} // Pass gameState to RaceTrack
           />
           <MathQuestion question={currentQuestion} onAnswer={handleAnswer} />
         </>
@@ -428,10 +400,13 @@ const MathsRangersGame = ({ onExitGame }) => {
               </>
             )}
             <div className="end-buttons">
-              <button className="play-again-button" onClick={startGame}>
+              <button
+                className="play-again-button"
+                onClick={() => startGame(userDetails)}
+              >
                 🔄 Race Again
               </button>
-              <button className="back-button" onClick={resetGame}>
+              <button className="back-button" onClick={() => navigate("/")}>
                 🏠 Back to Menu
               </button>
             </div>
@@ -440,7 +415,6 @@ const MathsRangersGame = ({ onExitGame }) => {
       )}
       {exitButton}
 
-      {/* Music Toggle Button */}
       <audio
         ref={musicRef}
         src={"/src/assets/car-sound.mp3"}
@@ -456,7 +430,6 @@ const MathsRangersGame = ({ onExitGame }) => {
         {musicOn ? "🎵" : "🔇"}
       </div>
 
-      {/* Hint Button and Hint Display */}
       {gameState !== "ready" && gameState !== "finished" && (
         <>
           <button

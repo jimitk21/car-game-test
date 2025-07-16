@@ -302,7 +302,7 @@
 .nitro-card-float {
   position: fixed;
   top: 0;
-  left: 50%;
+  left: 55%;
   transform: translateX(-50%);
   z-index: 2000;
   background: rgba(30, 30, 60, 0.98);
