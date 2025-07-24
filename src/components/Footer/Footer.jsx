@@ -161,7 +161,12 @@ const Footer = ({
               <div className="social-links">
                 <button
                   className="social-link github"
-                  onClick={triggerConfetti}
+                  onClick={() =>
+                    window.open(
+                      "https://github.com/jimitk21/playpower-hackathon",
+                      "_blank"
+                    )
+                  }
                 >
                   <span>🐙</span>
                   <span>GitHub Repository</span>
