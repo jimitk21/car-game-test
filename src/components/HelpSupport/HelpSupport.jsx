@@ -38,8 +38,8 @@ const HelpSupport = ({ onClose }) => {
                 <div className="help-text">
                   <h4>Clock Kingdom</h4>
                   <p>
-                    Learn to tell time with magical clock towers and daily
-                    adventures!
+                    Learn to tell time with magical clock tower and set the
+                    clock according to the need !!
                   </p>
                 </div>
               </div>
@@ -48,37 +48,8 @@ const HelpSupport = ({ onClose }) => {
                 <div className="help-text">
                   <h4>Math Rangers</h4>
                   <p>
-                    Defeat math bandits in epic duels with addition,
-                    subtraction, and more!
-                  </p>
-                </div>
-              </div>
-              <div className="help-item">
-                <span className="help-icon">🧚‍♀️</span>
-                <div className="help-text">
-                  <h4>Fraction Forest</h4>
-                  <p>
-                    Mix magical potions and learn fractions with forest spirits!
-                  </p>
-                </div>
-              </div>
-              <div className="help-item">
-                <span className="help-icon">🥷</span>
-                <div className="help-text">
-                  <h4>Number Ninjas</h4>
-                  <p>
-                    Master place values in a peaceful dojo with floating
-                    numbers!
-                  </p>
-                </div>
-              </div>
-              <div className="help-item">
-                <span className="help-icon">⏳</span>
-                <div className="help-text">
-                  <h4>Time Traveler's Tower</h4>
-                  <p>
-                    Climb the mystical tower and face the Time Bandit in the
-                    ultimate challenge!
+                    Defeat the AI Cars in a race with maths skills and win the
+                    race !!
                   </p>
                 </div>
               </div>
@@ -138,7 +109,7 @@ const HelpSupport = ({ onClose }) => {
                   <div className="developer-avatar">⭐</div>
                   <h4>Meet Kathiriya</h4>
                   <p className="developer-role">
-                    Full Stack Developer, Optimoz
+                    Finding Relevant Opportunities
                   </p>
                   <p className="developer-qualification">
                     🎓 B.Tech - PDEU (2025 passout)

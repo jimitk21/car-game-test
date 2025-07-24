@@ -65,7 +65,7 @@ const ContactUs = ({ onClose }) => {
                   <div className="developer-avatar">⭐</div>
                   <h4>Meet Kathiriya</h4>
                   <p className="developer-role">
-                    Full Stack Developer, Optimoz
+                    Finding Relevant Opportunities
                   </p>
                   <p className="developer-qualification">
                     🎓 B.Tech - PDEU (2025 passout)

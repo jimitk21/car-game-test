@@ -27,45 +27,16 @@ const ParentsTeachersSection = () => {
       // "Created by educators to perfectly complement classroom learning and homework assignments!",
       color: "linear-gradient(135deg, #FFE4B5, #FFEAA7)",
     },
+
     {
-      id: "gemini-ai",
-      icon: "🤖",
-      title: "Gemini AI Support",
-      description:
-        "Our intelligent AI guide provides personalized hints, encouragement, and adaptive learning support.",
-      // tooltip:
-      //   "Smart assistance that adapts to each child's learning pace and provides just the right amount of help!",
-      color: "linear-gradient(135deg, #DDA0DD, #E6E6FA)",
-    },
-    {
-      id: "no-signup",
-      icon: "🔓",
-      title: "No Signup Needed",
-      description:
-        "Jump straight into learning! No complicated registration, passwords, or personal information required.",
-      // tooltip:
-      //   "Safe, secure, and ready to play in seconds - just click and start learning!",
-      color: "linear-gradient(135deg, #98FB98, #90EE90)",
-    },
-    {
-      id: "safe-environment",
+      id: "instant-safe-access",
       icon: "🛡️",
-      title: "Safe Learning Space",
+      title: "Instant & Safe Learning",
       description:
-        "Ad-free, secure platform designed specifically for young learners with child-safe interactions.",
+        "Start learning instantly—no sign-up needed! Our ad-free, secure platform ensures a child-friendly space with no distractions or risks.",
       // tooltip:
-      //   "Protected environment with no external links, inappropriate content, or distracting advertisements!",
-      color: "linear-gradient(135deg, #FFB6C1, #FFA0B4)",
-    },
-    {
-      id: "multi-device",
-      icon: "📱",
-      title: "Works Everywhere",
-      description:
-        "Seamless experience across tablets, computers, and phones - learning never stops, anywhere you go!",
-      // tooltip:
-      //   "Responsive design that automatically adjusts to any screen size for the perfect learning experience!",
-      color: "linear-gradient(135deg, #DEB887, #D2B48C)",
+      //   "Enjoy a protected, password-free environment built just for young minds. No ads, no data collection—just safe, fun learning!",
+      color: "linear-gradient(135deg, #98FB98, #FFB6C1)",
     },
   ];
 
@@ -159,54 +130,6 @@ const ParentsTeachersSection = () => {
                 <span>Basic Math</span>
                 <span>Problem Solving</span>
                 <span>Mental Calculation</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="benefit-item">
-            <div className="benefit-icon">🧚‍♀️</div>
-            <div className="benefit-content">
-              <h4>Fraction Forest</h4>
-              <p>
-                Fraction concepts, visual learning, comparison skills, and
-                proportional reasoning
-              </p>
-              <div className="benefit-tags">
-                <span>Fraction Basics</span>
-                <span>Visual Learning</span>
-                <span>Comparisons</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="benefit-item">
-            <div className="benefit-icon">🥷</div>
-            <div className="benefit-content">
-              <h4>Number Ninjas</h4>
-              <p>
-                Place value understanding, number sense development, and logical
-                thinking skills
-              </p>
-              <div className="benefit-tags">
-                <span>Place Value</span>
-                <span>Number Sense</span>
-                <span>Logic Skills</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="benefit-item">
-            <div className="benefit-icon">⏳</div>
-            <div className="benefit-content">
-              <h4>Time Traveler's Tower</h4>
-              <p>
-                Advanced time concepts, planning skills, critical thinking, and
-                problem-solving mastery
-              </p>
-              <div className="benefit-tags">
-                <span>Advanced Time</span>
-                <span>Critical Thinking</span>
-                <span>Planning Skills</span>
               </div>
             </div>
           </div>

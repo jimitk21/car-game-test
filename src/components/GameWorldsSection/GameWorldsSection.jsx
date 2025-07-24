@@ -44,60 +44,6 @@ const GameWorldsSection = ({ onStartClockKingdom, onStartMathsRangers }) => {
       color: "linear-gradient(135deg, #DEB887 0%, #D2B48C 50%, #CD853F 100%)",
       decorations: ["🌵", "🐎", "⭐", "🎯"],
     },
-    {
-      id: "fraction-forest",
-      title: "Fraction Forest",
-      subtitle: "Magical Potion Making",
-      description:
-        "Enter an enchanted fairyland where glowing potion and forest spirits guide you through fraction magic!",
-      icon: "🧚‍♀️",
-      backgroundEmoji: "🌲",
-      features: [
-        "Fraction Recognition",
-        "Visual Comparisons",
-        "Potion Mixing",
-        // "Forest Spirit Quests",
-      ],
-      difficulty: "Moderate",
-      color: "linear-gradient(135deg, #98FB98 0%, #90EE90 50%, #32CD32 100%)",
-      decorations: ["🦋", "🍄", "✨", "🧪"],
-    },
-    {
-      id: "number-ninjas",
-      title: "Number Ninjas",
-      subtitle: "Peaceful Dojo Training",
-      description:
-        "Master place values and number puzzles in a serene dojo filled with floating numbers and ancient wisdom!",
-      icon: "🥷",
-      backgroundEmoji: "🏯",
-      features: [
-        "Place Value Mastery",
-        "Number Composition",
-        "Ninja Scrolls",
-        // "Shadow Animations",
-      ],
-      difficulty: "Advanced",
-      color: "linear-gradient(135deg, #E6E6FA 0%, #D8BFD8 50%, #DDA0DD 100%)",
-      decorations: ["🏮", "📜", "⚡", "🌸"],
-    },
-    {
-      id: "time-travelers-tower",
-      title: "Time  Tower",
-      subtitle: "Time Mastery Challenge",
-      description:
-        "Climb the mystical tower through glowing stairways and face the mischievous Time Bandit in the ultimate challenge!",
-      icon: "⏳",
-      backgroundEmoji: "🗼",
-      features: [
-        "Time Addition/Subtraction",
-        "Schedule Planning",
-        "Celestial Clockwork",
-        // "Boss Battle",
-      ],
-      difficulty: "Expert",
-      color: "linear-gradient(135deg, #FFB6C1 0%, #FFA0B4 50%, #FF69B4 100%)",
-      decorations: ["⚡", "🌟", "🔮", "👑"],
-    },
   ];
 
   const handleGameClick = (gameId) => {
