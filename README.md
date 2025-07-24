@@ -1,13 +1,126 @@
-# React + Vite
+# EduQuest: Adventures in Learning
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Table of Contents
 
-Currently, two official plugins are available:
+- [About the Project](#about-the-project)
+- [Tech Stack](#tech-stack)
+- [Why Was It Built?](#why-was-it-built)
+- [Features](#features)
+- [Game Worlds](#game-worlds)
+- [Educational Benefits](#educational-benefits)
+- [How to Install & Run](#how-to-install--run)
+- [Creators](#creators)
+- [License & Acknowledgments](#license--acknowledgments)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## About the Project
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# car-game-test
+**EduQuest** is a demo application created during the Playpower Labs Hackathon. It showcases how educational content can be made engaging and interactive through gamification and storytelling. The app is designed for children in grades 1-3, focusing on fundamental math skills, time-telling, and logical thinking.
+
+---
+
+## Tech Stack
+
+- **Frontend:** React 19, Vite
+- **Routing:** React Router DOM
+- **PDF Generation:** jsPDF
+- **Linting:** ESLint
+- **Styling:** CSS (custom, responsive, animated)
+- **Other:** No backend, all interactions are local and temporary
+
+---
+
+## Why Was It Built?
+
+This project was built to demonstrate how learning can be transformed into a fun, magical adventure for young children. By combining interactive games, beautiful design, and storytelling, EduQuest aims to make education both effective and enjoyable.
+
+---
+
+## Features
+
+- 🎮 Interactive Learning Games
+- 🎨 Beautiful, animated UI/UX
+- 🎵 Immersive background music and sound effects
+- 🏆 Achievement badges and progress tracking
+- 🛡️ Safe, ad-free, and no sign-up required
+
+---
+
+## Game Worlds
+
+- **Clock Kingdom:**  
+  Learn to read analog and digital clocks, match times, and understand AM/PM through magical adventures.
+
+- **Math Rangers:**  
+  Practice addition, subtraction, and multiplication in a Wild West setting, racing against AI cars and solving math duels.
+
+---
+
+## Educational Benefits
+
+- **Clock Kingdom:**
+
+  - Time reading skills
+  - AM/PM concepts
+  - Daily scheduling
+  - Temporal reasoning
+
+- **Math Rangers:**
+  - Fundamental arithmetic
+  - Problem-solving strategies
+  - Mental math fluency
+
+---
+
+## How to Install & Run
+
+1. **Clone the repository:**
+
+   ```sh
+   git clone <repo-url>
+   cd Car
+   ```
+
+2. **Install dependencies:**
+
+   ```sh
+   npm install
+   ```
+
+3. **Start the development server:**
+
+   ```sh
+   npm run dev
+   ```
+
+   The app will be available at [http://localhost:5173](http://localhost:5173) (or as indicated in your terminal).
+
+4. **Build for production:**
+
+   ```sh
+   npm run build
+   ```
+
+5. **Preview the production build:**
+   ```sh
+   npm run preview
+   ```
+
+---
+
+## Creators
+
+- **Jimit Karangia** (Senior Analyst, Capgemini)  
+  [LinkedIn](https://www.linkedin.com/in/jimit-karangia-7090062bb/) | jimitk191@gmail.com
+
+- **Meet Kathiriya**
+
+---
+
+## License & Acknowledgments
+
+- Created for the Playpower Labs Hackathon.
+- No data collection or storage; all interactions are local.
+- Feel free to explore and learn from the code and design concepts.
+- Special thanks to Playpower Labs for organizing the hackathon!
