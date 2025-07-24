@@ -8,7 +8,8 @@ const RaceTrack = ({
   aiVehicles,
   playerSpeed,
   nitroActive,
-  gameState, // Accept gameState prop
+  gameState,
+  onProgressUpdate, // New prop for progress callback
 }) => {
   const [trackWidth, setTrackWidth] = useState(800);
   const [vehicles, setVehicles] = useState([]);
@@ -145,12 +146,12 @@ const RaceTrack = ({
     );
   }, [playerSpeed]);
 
-  // Update vehicle positions
+  // Update vehicle positions and report progress
   useEffect(() => {
     if (gameState === "finished") return; // Stop updating if game is finished
     const updatePositions = () => {
-      setVehicles((prev) =>
-        prev.map((vehicle) => {
+      setVehicles((prev) => {
+        const updatedVehicles = prev.map((vehicle) => {
           const newVehicle = { ...vehicle };
 
           // Update position based on direction and speed
@@ -176,13 +177,28 @@ const RaceTrack = ({
           }
 
           return newVehicle;
-        })
-      );
+        });
+
+        // Calculate progress for each vehicle
+        const progressData = {
+          playerProgress: getProgressPercentage(
+            updatedVehicles.find((v) => v.id === "player")
+          ),
+          aiProgress: updatedVehicles
+            .filter((v) => v.id !== "player")
+            .map((v) => getProgressPercentage(v)),
+        };
+
+        // Call the callback with progress data
+        onProgressUpdate(progressData);
+
+        return updatedVehicles;
+      });
     };
 
     const interval = setInterval(updatePositions, 50);
     return () => clearInterval(interval);
-  }, [RACE_DISTANCE, gameState]);
+  }, [RACE_DISTANCE, gameState, onProgressUpdate]);
 
   // Check for race completion
   useEffect(() => {
@@ -197,15 +213,7 @@ const RaceTrack = ({
 
     const direction = vehicle.direction === "right" ? -1 : 1;
 
-    // Player car always faces right
     let transform = "scaleX(1)";
-    // if (vehicle.id !== "player") {
-    //   if (vehicle.direction === "right") {
-    //     transform = "scaleX(-1)";
-    //   } else {
-    //     transform = "scaleX(1)";
-    //   }
-    // }
     if (vehicle.direction === "right") {
       transform = "scaleX(-1)";
     } else {
@@ -214,9 +222,9 @@ const RaceTrack = ({
 
     return {
       left: `${leftPosition}px`,
-      transform: `scaleX(${direction})`, // fallback
+      transform: `scaleX(${direction})`,
       "--direction": direction,
-      "--boostScale": 1.1, // optional, in case you want to tweak scale effect dynamically
+      "--boostScale": 1.1,
     };
   };
 
@@ -266,16 +274,6 @@ const RaceTrack = ({
       {/* Start and Finish Lines */}
       <div className="start-line"></div>
       <div className="finish-line"></div>
-
-      {/* Lap Counter */}
-      {/* <div className="lap-counter">
-        Player: Lap{" "}
-        {Math.min(
-          vehicles.find((v) => v.id === "player")?.currentLap || 1,
-          TOTAL_LAPS
-        )}
-        /{TOTAL_LAPS}
-      </div> */}
 
       {/* Direction Indicators */}
       <div className="direction-indicator left">←</div>

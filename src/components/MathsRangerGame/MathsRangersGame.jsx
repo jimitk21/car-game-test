@@ -240,55 +240,38 @@ const MathsRangersGame = ({ onExitGame }) => {
     }, 1000);
   };
 
+  // Callback to handle progress updates from RaceTrack
+  const handleProgressUpdate = (progressData) => {
+    if (gameState !== "playing") return;
+
+    const { playerProgress, aiProgress } = progressData;
+    if (
+      playerProgress >= 100 ||
+      aiProgress.some((progress) => progress >= 100)
+    ) {
+      setGameState("finished");
+      if (
+        playerProgress >= 100 &&
+        aiProgress.every((progress) => playerProgress >= progress)
+      ) {
+        setWinner("player");
+      } else {
+        setWinner("ai");
+      }
+    }
+  };
+
   useEffect(() => {
     if (gameState === "playing") {
       gameLoopRef.current = setInterval(() => {
         setGameTime((prev) => {
           if (prev + 1 >= timeLimit) {
+            setGameState("finished");
+            setWinner("ai");
             return timeLimit;
           }
           return prev + 1;
         });
-
-        setPlayerPosition((prev) => prev + playerSpeed);
-
-        setAiVehicles((prev) =>
-          prev.map((vehicle, index) => {
-            let base = 1 + index * 0.15;
-            let random = Math.random() * 0.5 - 0.2;
-            let speed = base + random;
-            if (Math.random() < 0.05) speed += 0.7;
-            return { ...vehicle, position: vehicle.position + speed };
-          })
-        );
-
-        setTimeout(() => {
-          let playerPos, aiPositions;
-          setPlayerPosition((p) => {
-            playerPos = p;
-            return p;
-          });
-          setAiVehicles((ai) => {
-            aiPositions = ai.map((v) => v.position);
-            return ai;
-          });
-
-          // End the game as soon as either the player or any AI fills their progress bar
-          if (
-            playerPos >= 1800 ||
-            (aiPositions && aiPositions.some((pos) => pos >= 1800))
-          ) {
-            setGameState("finished");
-            if (
-              playerPos >= 1800 &&
-              (!aiPositions || aiPositions.every((pos) => playerPos >= pos))
-            ) {
-              setWinner("player");
-            } else if (aiPositions && aiPositions.some((pos) => pos >= 1800)) {
-              setWinner("ai");
-            }
-          }
-        }, 0);
       }, 100);
     }
 
@@ -297,7 +280,7 @@ const MathsRangersGame = ({ onExitGame }) => {
         clearInterval(gameLoopRef.current);
       }
     };
-  }, [gameState, playerSpeed, timeLimit]);
+  }, [gameState, timeLimit]);
 
   useEffect(() => {
     return () => {
@@ -369,7 +352,8 @@ const MathsRangersGame = ({ onExitGame }) => {
             aiVehicles={aiVehicles}
             playerSpeed={playerSpeed}
             nitroActive={nitroActive}
-            gameState={gameState} // Pass gameState to RaceTrack
+            gameState={gameState}
+            onProgressUpdate={handleProgressUpdate}
           />
           <MathQuestion question={currentQuestion} onAnswer={handleAnswer} />
         </>
