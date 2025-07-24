@@ -96,25 +96,15 @@ This project was built to demonstrate how learning can be transformed into a fun
 
    The app will be available at [http://localhost:5173](http://localhost:5173) (or as indicated in your terminal).
 
-4. **Build for production:**
-
-   ```sh
-   npm run build
-   ```
-
-5. **Preview the production build:**
-   ```sh
-   npm run preview
-   ```
-
 ---
 
 ## Creators
 
-- **Jimit Karangia** (Senior Analyst, Capgemini)  
+- **Jimit Karangia** (Senior Analyst, Capgemini | PDEU'ICT-25 Passout)  
   [LinkedIn](https://www.linkedin.com/in/jimit-karangia-7090062bb/) | jimitk191@gmail.com
 
-- **Meet Kathiriya**
+- **Meet Kathiriya**(Finding Relevant Opportunities | PDEU'ICT-25 Passout)  
+  [LinkedIn](https://www.linkedin.com/in/meet-kathiriya-534318224/) | meetkathiriya596@gmail.com
 
 ---
 
