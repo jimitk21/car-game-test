@@ -1,9 +1,20 @@
 import React from "react";
 import AnalogClock from "./AnalogClock.jsx";
 
-const GuessTheTime = ({ currentQuestion, handleGuessAnswer, showFeedback }) => {
+const GuessTheTime = ({
+  currentQuestion,
+  handleGuessAnswer,
+  showFeedback,
+  timeLeft,
+  timerActive,
+}) => {
   return (
     <div className="guess-time-game">
+      <div className="timer-display">
+        Time Left:{" "}
+        <span className={timeLeft <= 3 ? "timer-warning" : ""}>{timeLeft}</span>{" "}
+        seconds
+      </div>
       <div className="clock-display">
         <AnalogClock
           hours={currentQuestion.time.hours}
@@ -17,7 +28,7 @@ const GuessTheTime = ({ currentQuestion, handleGuessAnswer, showFeedback }) => {
             key={index}
             className="option-btn"
             onClick={() => handleGuessAnswer(index)}
-            disabled={showFeedback !== ""}
+            disabled={showFeedback !== "" || timeLeft <= 0}
           >
             {option}
           </button>

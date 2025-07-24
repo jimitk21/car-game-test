@@ -1687,3 +1687,103 @@
     font-size: 0.8rem;
   }
 }
+
+.timer-display {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #8b4513;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.timer-warning {
+  color: #d32f2f;
+  font-weight: bold;
+  animation: timer-blink 1s steps(2, start) infinite;
+}
+
+@keyframes timer-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.how-to-play-btn {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  z-index: 10010;
+  background: linear-gradient(135deg, #fffbe7 0%, #ffe066 100%);
+  border: 2px solid #ffd700;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #8b4513;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.how-to-play-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+}
+
+.how-to-play-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.how-to-play-modal {
+  background: #fffbe7;
+  border: 3px solid #ffd700;
+  border-radius: 20px;
+  padding: 32px 28px;
+  max-width: 400px;
+  width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  text-align: left;
+  color: #8b4513;
+  position: relative;
+}
+.how-to-play-modal h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #8b4513;
+  margin-bottom: 16px;
+}
+.how-to-play-modal ol {
+  margin-left: 1.2em;
+  margin-bottom: 20px;
+  font-size: 1.05rem;
+}
+.close-how-to-play-btn {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border: none;
+  border-radius: 15px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #8b4513;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+  display: block;
+  margin: 0 auto;
+}
+.close-how-to-play-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+}

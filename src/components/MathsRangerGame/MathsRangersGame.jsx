@@ -40,6 +40,7 @@ const MathsRangersGame = ({ onExitGame }) => {
   const gameLoopRef = useRef();
   const nitroTimeoutRef = useRef();
   const speedTimeoutRef = useRef();
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   const generateQuestion = () => {
     const operations = ["+", "-", "×"];
@@ -429,6 +430,52 @@ const MathsRangersGame = ({ onExitGame }) => {
             </div>
           )}
         </>
+      )}
+      {gameState === "playing" && (
+        <button
+          className="how-to-play-btn"
+          onClick={() => setShowHowToPlay(true)}
+        >
+          ❓ How to Play
+        </button>
+      )}
+      {showHowToPlay && (
+        <div className="how-to-play-overlay">
+          <div className="how-to-play-modal">
+            <h2>How to Play</h2>
+            <ol>
+              <li>
+                Answer math questions as quickly and accurately as you can to
+                boost your car’s speed!
+              </li>
+              <li>
+                Choose the correct answer from the options. Each correct answer
+                gives you a Nitro Boost for extra speed.
+              </li>
+              <li>
+                If you answer incorrectly, your car will slow down for a short
+                time.
+              </li>
+              <li>
+                Race against AI vehicles—reach the finish line before them to
+                win!
+              </li>
+              <li>
+                Watch your Nitro Queue for extra boosts if you answer quickly in
+                a row.
+              </li>
+              <li>
+                Try to get the highest score and finish as fast as possible!
+              </li>
+            </ol>
+            <button
+              className="close-how-to-play-btn"
+              onClick={() => setShowHowToPlay(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

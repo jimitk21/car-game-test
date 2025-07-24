@@ -86,9 +86,6 @@ const InteractiveAnalogClock = ({
           </div>
         </div>
       </div>
-      <button className="check-answer-btn" onClick={checkClockAnswer}>
-        ✨ Check My Answer ✨
-      </button>
     </div>
   );
 };

@@ -18,6 +18,7 @@ function shuffle(array) {
 
 const TOTAL_QUESTIONS = 12;
 const QUESTIONS_PER_SECTION = 4;
+const TIMER_DURATION = 15; // seconds
 
 const guessTimeQuestionsOrig = [
   {
@@ -246,6 +247,7 @@ const ClockKingdom = ({ onExitGame }) => {
   const [showHint, setShowHint] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
   const [wrongAnswers, setWrongAnswers] = useState([]);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   const [guessTimeQuestions, setGuessTimeQuestions] = useState([]);
   const [ampmQuestions, setAMPMQuestions] = useState([]);
@@ -256,6 +258,9 @@ const ClockKingdom = ({ onExitGame }) => {
   const [targetTime, setTargetTime] = useState({ hours: 3, minutes: 15 });
   const [clockHours, setClockHours] = useState(12);
   const [clockMinutes, setClockMinutes] = useState(0);
+
+  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
+  const [timerActive, setTimerActive] = useState(false);
 
   const musicRef = useRef(null);
   const tickRef = useRef(null);
@@ -272,6 +277,47 @@ const ClockKingdom = ({ onExitGame }) => {
     setGuessTimeQuestions(shuffle(guessTimeQuestionsOrig));
     setAMPMQuestions(shuffle(ampmQuestionsOrig));
   }, []);
+
+  // Helper to reset timer
+  const resetTimer = () => {
+    setTimeLeft(TIMER_DURATION);
+    setTimerActive(true);
+  };
+
+  // Start timer on new question
+  useEffect(() => {
+    if (gameState === "guessTime") resetTimer();
+  }, [gameState, guessIndex]);
+  useEffect(() => {
+    if (gameState === "setClock") resetTimer();
+  }, [gameState, setClockIndex]);
+  useEffect(() => {
+    if (gameState === "ampm") resetTimer();
+  }, [gameState, ampmIndex]);
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (!timerActive) return;
+    if (timeLeft <= 0) {
+      setTimerActive(false);
+      // Auto-submit as incorrect if time runs out, and immediately proceed
+      if (gameState === "guessTime") {
+        handleGuessAnswer(-1, true); // true = isTimeoutImmediate
+      } else if (gameState === "setClock") {
+        checkClockAnswer("timeout", true);
+      } else if (gameState === "ampm") {
+        handleAMPMAnswer("timeout", true);
+      }
+      return;
+    }
+    const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [timerActive, timeLeft, gameState]);
+
+  // Stop timer when feedback is shown
+  useEffect(() => {
+    if (showFeedback) setTimerActive(false);
+  }, [showFeedback]);
 
   const getCurrentGameName = () => {
     switch (gameState) {
@@ -323,6 +369,8 @@ const ClockKingdom = ({ onExitGame }) => {
     setTargetTime(generateNewTargetTime());
     setClockHours(12);
     setClockMinutes(0);
+    setGuessTimeQuestions(shuffle(guessTimeQuestionsOrig));
+    setAMPMQuestions(shuffle(ampmQuestionsOrig));
   };
 
   const generateNewTargetTime = () => {
@@ -332,9 +380,12 @@ const ClockKingdom = ({ onExitGame }) => {
     };
   };
 
-  const handleGuessAnswer = (selectedIndex) => {
+  // --- MODIFIED handlers to support immediate advance on timeout ---
+  const handleGuessAnswer = (selectedIndex, isTimeoutImmediate = false) => {
     const current = guessTimeQuestions[guessIndex];
-    if (selectedIndex === current.correct) {
+    // If timeout, selectedIndex will be -1
+    const isTimeout = selectedIndex === -1;
+    if (!isTimeout && selectedIndex === current.correct) {
       setScore((s) => s + 1);
       setProgress((p) => p + 100 / TOTAL_QUESTIONS);
       setShowFeedback("correct");
@@ -356,12 +407,26 @@ const ClockKingdom = ({ onExitGame }) => {
           question: `${current.time.hours}:${String(
             current.time.minutes
           ).padStart(2, "0")}`,
-          selectedAnswer: current.options[selectedIndex],
+          selectedAnswer: isTimeout
+            ? "(No answer)"
+            : current.options[selectedIndex],
           correctAnswer: current.options[current.correct],
         },
       ]);
       setShowFeedback("incorrect");
-      setTimeout(() => setShowFeedback(""), 1200);
+      if (isTimeoutImmediate) {
+        setTimeout(() => {
+          setShowFeedback("");
+          setShowMonkey(false);
+          if (guessIndex + 1 < QUESTIONS_PER_SECTION) {
+            setGuessIndex(guessIndex + 1);
+          } else {
+            setGameState("setClock");
+          }
+        }, 1000);
+      } else {
+        setTimeout(() => setShowFeedback(""), 1200);
+      }
     }
   };
 
@@ -373,13 +438,14 @@ const ClockKingdom = ({ onExitGame }) => {
     }
   }, [gameState, setClockIndex]);
 
-  const checkClockAnswer = () => {
+  const checkClockAnswer = (timeoutFlag, isTimeoutImmediate = false) => {
     const normalizedTargetHours =
       targetTime.hours === 0 ? 12 : targetTime.hours;
     const normalizedClockHours = clockHours === 0 ? 12 : clockHours;
     const hourMatch = normalizedClockHours === normalizedTargetHours;
     const minuteMatch = Math.abs(clockMinutes - targetTime.minutes) <= 5;
-    if (hourMatch && minuteMatch) {
+    const isTimeout = timeoutFlag === "timeout";
+    if (!isTimeout && hourMatch && minuteMatch) {
       setScore((s) => s + 1);
       setProgress((p) => p + 100 / TOTAL_QUESTIONS);
       setShowFeedback("correct");
@@ -401,22 +467,37 @@ const ClockKingdom = ({ onExitGame }) => {
           question: `${String(targetTime.hours).padStart(2, "0")}:${String(
             targetTime.minutes
           ).padStart(2, "0")}`,
-          selectedAnswer: `${String(clockHours).padStart(2, "0")}:${String(
-            clockMinutes
-          ).padStart(2, "0")}`,
+          selectedAnswer: isTimeout
+            ? "(No answer)"
+            : `${String(clockHours).padStart(2, "0")}:${String(
+                clockMinutes
+              ).padStart(2, "0")}`,
           correctAnswer: `${String(targetTime.hours).padStart(2, "0")}:${String(
             targetTime.minutes
           ).padStart(2, "0")}`,
         },
       ]);
       setShowFeedback("incorrect");
-      setTimeout(() => setShowFeedback(""), 1200);
+      if (isTimeoutImmediate) {
+        setTimeout(() => {
+          setShowFeedback("");
+          if (setClockIndex + 1 < QUESTIONS_PER_SECTION) {
+            setSetClockIndex(setClockIndex + 1);
+            setTargetTime(generateNewTargetTime());
+          } else {
+            setGameState("ampm");
+          }
+        }, 1000);
+      } else {
+        setTimeout(() => setShowFeedback(""), 1200);
+      }
     }
   };
 
-  const handleAMPMAnswer = (answer) => {
+  const handleAMPMAnswer = (answer, isTimeoutImmediate = false) => {
     const current = ampmQuestions[ampmIndex];
-    if (answer === current.correct) {
+    const isTimeout = answer === "timeout";
+    if (!isTimeout && answer === current.correct) {
       setScore((s) => s + 1);
       setProgress((p) => p + 100 / TOTAL_QUESTIONS);
       setShowFeedback("correct");
@@ -435,12 +516,23 @@ const ClockKingdom = ({ onExitGame }) => {
         {
           game: "AM/PM Adventure",
           question: current.question,
-          selectedAnswer: answer,
+          selectedAnswer: isTimeout ? "(No answer)" : answer,
           correctAnswer: current.correct,
         },
       ]);
       setShowFeedback("incorrect");
-      setTimeout(() => setShowFeedback(""), 1200);
+      if (isTimeoutImmediate) {
+        setTimeout(() => {
+          setShowFeedback("");
+          if (ampmIndex + 1 < QUESTIONS_PER_SECTION) {
+            setAMPMIndex(ampmIndex + 1);
+          } else {
+            setGameState("completed");
+          }
+        }, 1000);
+      } else {
+        setTimeout(() => setShowFeedback(""), 1200);
+      }
     }
   };
 
@@ -537,6 +629,8 @@ const ClockKingdom = ({ onExitGame }) => {
                 currentQuestion={guessTimeQuestions[guessIndex]}
                 handleGuessAnswer={handleGuessAnswer}
                 showFeedback={showFeedback}
+                timeLeft={timeLeft}
+                timerActive={timerActive}
               />
             )}
             {gameState === "setClock" && (
@@ -548,6 +642,8 @@ const ClockKingdom = ({ onExitGame }) => {
                 setClockMinutes={setClockMinutes}
                 checkClockAnswer={checkClockAnswer}
                 showFeedback={showFeedback}
+                timeLeft={timeLeft}
+                timerActive={timerActive}
               />
             )}
             {gameState === "ampm" && ampmQuestions.length > 0 && (
@@ -555,12 +651,27 @@ const ClockKingdom = ({ onExitGame }) => {
                 currentQuestion={ampmQuestions[ampmIndex]}
                 handleAMPMAnswer={handleAMPMAnswer}
                 showFeedback={showFeedback}
+                timeLeft={timeLeft}
+                timerActive={timerActive}
               />
             )}
             {gameState === "completed" && (
               <div className="completed-screen">
-                <h2 className="completed-title">Congratulations! 🎉</h2>
-                <p className="completed-desc">You finished all 12 questions!</p>
+                {wrongAnswers.length === 0 ? (
+                  <>
+                    <h2 className="completed-title">
+                      Congratulations! 🎉 Well done!
+                    </h2>
+                    <p className="completed-desc">
+                      You answered all 12 questions correctly!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="completed-title">Well tried!</h2>
+                    <p className="completed-desc">You can improve next time.</p>
+                  </>
+                )}
                 <div className="completed-celebration">
                   <span className="confetti">🎊</span>
                   <span className="confetti">🎉</span>
@@ -639,6 +750,52 @@ const ClockKingdom = ({ onExitGame }) => {
       <button className="exit-game-btn" onClick={onExitGame}>
         Exit Game
       </button>
+      {gameState !== "completed" && (
+        <button
+          className="how-to-play-btn"
+          onClick={() => setShowHowToPlay(true)}
+        >
+          ❓ How to Play
+        </button>
+      )}
+      {showHowToPlay && (
+        <div className="how-to-play-overlay">
+          <div className="how-to-play-modal">
+            <h2>How to Play</h2>
+            <ol>
+              <li>
+                <strong>Guess the Time:</strong> Look at the analog clock and
+                select the correct digital time from the options below.
+              </li>
+              <li>
+                <strong>Set the Time:</strong> You’ll see a digital time to
+                match. Use the <b>+5</b> and <b>-5</b> minute buttons, and the{" "}
+                <b>Hour +1</b> and <b>Hour -1</b> buttons to set the clock
+                hands. When you think it matches, press <b>Check Answer</b>.
+              </li>
+              <li>
+                <strong>AM/PM Adventure:</strong> Read the scene and think about
+                when the activity usually happens (morning or evening). Choose{" "}
+                <b>AM</b> or <b>PM</b> based on daily habits.
+              </li>
+              <li>
+                Earn points for each correct answer. Try to answer all 12
+                questions correctly!
+              </li>
+              <li>
+                If you run out of time, the game will move to the next question
+                automatically.
+              </li>
+            </ol>
+            <button
+              className="close-how-to-play-btn"
+              onClick={() => setShowHowToPlay(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
